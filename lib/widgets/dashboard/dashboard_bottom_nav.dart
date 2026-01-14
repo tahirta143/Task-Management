@@ -68,10 +68,10 @@ class DashboardBottomNav extends StatelessWidget {
         icon: Icon(Icons.task),
         label: 'Tasks',
       ),
-      const BottomNavigationBarItem(
-        icon: Icon(Icons.analytics),
-        label: 'Reports',
-      ),
+      // const BottomNavigationBarItem(
+      //   icon: Icon(Icons.analytics),
+      //   label: 'Reports',
+      // ),
     ];
 
     final items = isAdmin

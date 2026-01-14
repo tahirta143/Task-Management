@@ -1,6 +1,7 @@
 // screens/users_screen.dart
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:taskflow_app/screens/users/EditScreenUser.dart';
 
 import '../../models/user_model.dart';
 import '../../providers/auth_provider.dart';
@@ -26,6 +27,11 @@ class _UsersScreenState extends State<UsersScreen> {
       userProvider.fetchUsers();
     });
   }
+  Future<void> _onRefresh() async {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    await userProvider.fetchUsers();
+  }
+
 
   @override
   void dispose() {
@@ -85,19 +91,22 @@ class _UsersScreenState extends State<UsersScreen> {
         ],
         elevation: 1,
       ),
-      body: Column(
-        children: [
-          // Search and Filter Bar
-          _buildSearchFilterBar(userProvider),
+      body: RefreshIndicator(
+        onRefresh: _onRefresh,
+        child: Column(
+          children: [
+            // Search and Filter Bar
+            _buildSearchFilterBar(userProvider),
 
-          // Statistics Cards
-          _buildStatisticsCards(userProvider),
+            // Statistics Cards
+          //  _buildStatisticsCards(userProvider),
 
-          // User List
-          Expanded(
-            child: _buildUserList(userProvider),
-          ),
-        ],
+            // User List
+            Expanded(
+              child: _buildUserList(userProvider),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -184,81 +193,81 @@ class _UsersScreenState extends State<UsersScreen> {
     );
   }
 
-  Widget _buildStatisticsCards(UserProvider userProvider) {
-    final totalUsers = userProvider.allUsers.length;
-    final admins = userProvider.allUsers.where((u) => u.role == 'admin').length;
-    final managers = userProvider.allUsers.where((u) => u.role == 'manager').length;
-    final staff = userProvider.allUsers.where((u) => u.role == 'staff').length;
+  // Widget _buildStatisticsCards(UserProvider userProvider) {
+  //   final totalUsers = userProvider.allUsers.length;
+  //   final admins = userProvider.allUsers.where((u) => u.role == 'admin').length;
+  //   final managers = userProvider.allUsers.where((u) => u.role == 'manager').length;
+  //   final staff = userProvider.allUsers.where((u) => u.role == 'staff').length;
+  //
+  //   return Container(
+  //     padding: const EdgeInsets.all(16),
+  //     child: Row(
+  //       children: [
+  //         _buildStatCard('Total Users', totalUsers, Icons.people, Colors.blue),
+  //         const SizedBox(width: 12),
+  //         _buildStatCard('Admins', admins, Icons.admin_panel_settings, Colors.green),
+  //         const SizedBox(width: 12),
+  //         _buildStatCard('Managers', managers, Icons.manage_accounts, Colors.orange),
+  //         const SizedBox(width: 12),
+  //         _buildStatCard('Staff', staff, Icons.badge, Colors.purple),
+  //       ],
+  //     ),
+  //   );
+  // }
 
-    return Container(
-      padding: const EdgeInsets.all(16),
-      child: Row(
-        children: [
-          _buildStatCard('Total Users', totalUsers, Icons.people, Colors.blue),
-          const SizedBox(width: 12),
-          _buildStatCard('Admins', admins, Icons.admin_panel_settings, Colors.green),
-          const SizedBox(width: 12),
-          _buildStatCard('Managers', managers, Icons.manage_accounts, Colors.orange),
-          const SizedBox(width: 12),
-          _buildStatCard('Staff', staff, Icons.badge, Colors.purple),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildStatCard(String title, int count, IconData icon, Color color) {
-    return Expanded(
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 6,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: color.withOpacity(0.1),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(icon, color: color, size: 20),
-                ),
-                const Spacer(),
-                Text(
-                  '$count',
-                  style: const TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.w700,
-                    color: Colors.black87,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            Text(
-              title,
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.grey[600],
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+  // Widget _buildStatCard(String title, int count, IconData icon, Color color) {
+  //   return Expanded(
+  //     child: Container(
+  //       padding: const EdgeInsets.all(16),
+  //       decoration: BoxDecoration(
+  //         color: Colors.white,
+  //         borderRadius: BorderRadius.circular(12),
+  //         boxShadow: [
+  //           BoxShadow(
+  //             color: Colors.black.withOpacity(0.05),
+  //             blurRadius: 6,
+  //             offset: const Offset(0, 2),
+  //           ),
+  //         ],
+  //       ),
+  //       child: Column(
+  //         crossAxisAlignment: CrossAxisAlignment.start,
+  //         children: [
+  //           Row(
+  //             children: [
+  //               Container(
+  //                 padding: const EdgeInsets.all(8),
+  //                 decoration: BoxDecoration(
+  //                   color: color.withOpacity(0.1),
+  //                   shape: BoxShape.circle,
+  //                 ),
+  //                 child: Icon(icon, color: color, size: 20),
+  //               ),
+  //               const Spacer(),
+  //               Text(
+  //                 '$count',
+  //                 style: const TextStyle(
+  //                   fontSize: 24,
+  //                   fontWeight: FontWeight.w700,
+  //                   color: Colors.black87,
+  //                 ),
+  //               ),
+  //             ],
+  //           ),
+  //           const SizedBox(height: 8),
+  //           Text(
+  //             title,
+  //             style: TextStyle(
+  //               fontSize: 14,
+  //               color: Colors.grey[600],
+  //               fontWeight: FontWeight.w500,
+  //             ),
+  //           ),
+  //         ],
+  //       ),
+  //     ),
+  //   );
+  // }
 
   Widget _buildUserList(UserProvider userProvider) {
     if (userProvider.isLoading) {
@@ -362,44 +371,49 @@ class _UsersScreenState extends State<UsersScreen> {
               ),
             ),
             const SizedBox(width: 8),
-            _buildRoleBadge(user.role),
-            const Spacer(),
-            if (user.isActive)
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: Colors.green.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(
-                      width: 6,
-                      height: 6,
-                      decoration: const BoxDecoration(
-                        color: Colors.green,
-                        shape: BoxShape.circle,
-                      ),
-                    ),
-                    const SizedBox(width: 6),
-                    Text(
-                      'Active',
-                      style: TextStyle(
-                        color: Colors.green[700],
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+
           ],
         ),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 8),
+            Row(
+              children: [
+                _buildRoleBadge(user.role),
+                const Spacer(),
+                if (user.isActive)
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: Colors.green.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          width: 6,
+                          height: 6,
+                          decoration: const BoxDecoration(
+                            color: Colors.green,
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          'Active',
+                          style: TextStyle(
+                            color: Colors.green[700],
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+              ],
+            ),
             Row(
               children: [
                 Icon(Icons.email_outlined, size: 14, color: Colors.grey[500]),
@@ -515,19 +529,18 @@ class _UsersScreenState extends State<UsersScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              ListTile(
-                leading: const Icon(Icons.visibility, color: Colors.blue),
-                title: const Text('View Details'),
-                onTap: () {
-                  Navigator.pop(context);
-                  // Navigate to user details
-                },
-              ),
+
               ListTile(
                 leading: const Icon(Icons.edit, color: Colors.green),
                 title: const Text('Edit User'),
                 onTap: () {
-                  Navigator.pop(context);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => EditUserScreen(user: user),
+                    ),
+                  );
+
                   // Navigate to edit user
                 },
               ),
@@ -547,7 +560,7 @@ class _UsersScreenState extends State<UsersScreen> {
                 leading: const Icon(Icons.delete, color: Colors.red),
                 title: const Text('Delete User'),
                 onTap: () {
-                  Navigator.pop(context);
+                  // Navigator.pop(context);
                   _showDeleteDialog(context, user);
                 },
               ),
@@ -558,29 +571,91 @@ class _UsersScreenState extends State<UsersScreen> {
     );
   }
 
+  // void _showDeleteDialog(BuildContext context, User user) {
+  //   showDialog(
+  //     context: context,
+  //     builder: (context) => AlertDialog(
+  //       title: const Text('Delete User'),
+  //       content: Text('Are you sure you want to delete ${user.name}?'),
+  //       actions: [
+  //         TextButton(
+  //           onPressed: () => Navigator.pop(context),
+  //           child: const Text('Cancel'),
+  //         ),
+  //         TextButton(
+  //           onPressed: () {
+  //             Navigator.pop(context);
+  //             // Delete user logic
+  //           },
+  //           child: const Text(
+  //             'Delete',
+  //             style: TextStyle(color: Colors.red),
+  //           ),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
   void _showDeleteDialog(BuildContext context, User user) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Delete User'),
-        content: Text('Are you sure you want to delete ${user.name}?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              // Delete user logic
-            },
-            child: const Text(
-              'Delete',
-              style: TextStyle(color: Colors.red),
+      barrierDismissible: false,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Delete User'),
+          content: Text('Are you sure you want to delete ${user.name}?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
             ),
-          ),
-        ],
-      ),
+
+            Consumer<UserProvider>(
+              builder: (context, userProvider, _) {
+                return TextButton(
+                  onPressed: userProvider.isLoading
+                      ? null
+                      : () async {
+                    final success =
+                    await userProvider.deleteUser(user.id);
+
+                    if (success && context.mounted) {
+                      Navigator.pop(context); // close dialog
+
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('User deleted successfully'),
+                          backgroundColor: Colors.green,
+                        ),
+                      );
+                    } else {
+                      Navigator.pop(context);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                              userProvider.error ?? 'Delete failed'),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
+                    }
+                  },
+                  child: userProvider.isLoading
+                      ? const SizedBox(
+                    width: 18,
+                    height: 18,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                      : const Text(
+                    'Delete',
+                    style: TextStyle(color: Colors.red),
+                  ),
+                );
+              },
+            ),
+          ],
+        );
+      },
     );
   }
+
 }

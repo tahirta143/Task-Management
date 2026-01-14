@@ -2,11 +2,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:taskflow_app/screens/Task/taskCard.dart';
+import '../../models/task_model.dart';
 import '../../providers/task_provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/company_provider.dart';
 import '../../providers/user_provider.dart';
 import 'AddTaskScreen.dart';
+import 'edittaskdialog.dart';
 
 
 class TaskListScreen extends StatefulWidget {
@@ -97,7 +99,7 @@ class _TaskListScreenState extends State<TaskListScreen> {
           _buildSearchFilterBar(taskProvider, screenWidth),
 
           // Statistics Cards
-          _buildStatisticsCards(taskProvider),
+          //_buildStatisticsCards(taskProvider),
 
           // Task List
           Expanded(
@@ -259,27 +261,27 @@ class _TaskListScreenState extends State<TaskListScreen> {
     );
   }
 
-  Widget _buildStatisticsCards(TaskProvider taskProvider) {
-    final totalTasks = taskProvider.allTasks.length;
-    final pendingTasks = taskProvider.allTasks.where((t) => t.status == 'pending').length;
-    final inProgressTasks = taskProvider.allTasks.where((t) => t.status == 'in-progress').length;
-    final completedTasks = taskProvider.allTasks.where((t) => t.status == 'completed').length;
-
-    return Container(
-      padding: const EdgeInsets.all(16),
-      child: Row(
-        children: [
-          _buildStatCard('Total', totalTasks, Icons.list, Colors.blue),
-          const SizedBox(width: 12),
-          _buildStatCard('Pending', pendingTasks, Icons.pending, Colors.orange),
-          const SizedBox(width: 12),
-          _buildStatCard('In Progress', inProgressTasks, Icons.autorenew, Colors.blue),
-          const SizedBox(width: 12),
-          _buildStatCard('Completed', completedTasks, Icons.check_circle, Colors.green),
-        ],
-      ),
-    );
-  }
+  // Widget _buildStatisticsCards(TaskProvider taskProvider) {
+  //   final totalTasks = taskProvider.allTasks.length;
+  //   final pendingTasks = taskProvider.allTasks.where((t) => t.status == 'pending').length;
+  //   final inProgressTasks = taskProvider.allTasks.where((t) => t.status == 'in-progress').length;
+  //   final completedTasks = taskProvider.allTasks.where((t) => t.status == 'completed').length;
+  //
+  //   return Container(
+  //     padding: const EdgeInsets.all(16),
+  //     child: Row(
+  //       children: [
+  //         _buildStatCard('Total', totalTasks, Icons.list, Colors.blue),
+  //         const SizedBox(width: 12),
+  //         _buildStatCard('Pending', pendingTasks, Icons.pending, Colors.orange),
+  //         const SizedBox(width: 12),
+  //         _buildStatCard('In Progress', inProgressTasks, Icons.autorenew, Colors.blue),
+  //         const SizedBox(width: 12),
+  //         _buildStatCard('Completed', completedTasks, Icons.check_circle, Colors.green),
+  //       ],
+  //     ),
+  //   );
+  // }
 
   Widget _buildStatCard(String title, int count, IconData icon, Color color) {
     return Expanded(
@@ -402,8 +404,64 @@ class _TaskListScreenState extends State<TaskListScreen> {
         itemCount: taskProvider.tasks.length,
         itemBuilder: (context, index) {
           final task = taskProvider.tasks[index];
-          return TaskCard(task: task);
+          return TaskCard(
+            task: task,
+            onEdit: () => _editTask(context, task, taskProvider),
+            onDelete: () => _deleteTask(context, task.id, taskProvider),
+          );
+
         },
+      ),
+    );
+  }Future<void> _editTask(BuildContext context, Task task, TaskProvider taskProvider) async {
+    final result = await showDialog<Map<String, dynamic>>(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => EditTaskDialog(
+        task: task,
+        taskProvider: taskProvider,
+      ),
+    );
+
+    if (result != null && result['success'] == true) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(result['message']),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
+    }
+  }
+
+  Future<void> _deleteTask(BuildContext context, String taskId, TaskProvider taskProvider) async {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Delete Task'),
+        content: const Text('Are you sure you want to delete this task?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () async {
+              Navigator.pop(context);
+              final success = await taskProvider.deleteTask(taskId);
+              if (success && context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Task deleted successfully'),
+                    backgroundColor: Colors.green,
+                  ),
+                );
+              }
+            },
+            child: const Text('Delete', style: TextStyle(color: Colors.red)),
+          ),
+        ],
       ),
     );
   }

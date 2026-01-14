@@ -1,111 +1,134 @@
 class DashboardStats {
-  final int totalTasks;
-  final int completedTasks;
-  final int pendingTasks;
-  final int inProgressTasks;
-  final int delayedTasks;
-  final int teamMembers;
-  final int activeCompanies;
-  final double productivity;
-  final List<ChartData> chartData;
-  final List<RecentActivity> recentActivities;
-  final List<RecentTask> recentTasks;
+  final Tasks tasks;
+  final Subtasks subtasks;
   final Summary summary;
+  final List<RecentTask> recentTasks;
 
   DashboardStats({
-    required this.totalTasks,
-    required this.completedTasks,
-    required this.pendingTasks,
-    required this.inProgressTasks,
-    required this.delayedTasks,
-    required this.teamMembers,
-    required this.activeCompanies,
-    required this.productivity,
-    required this.chartData,
-    required this.recentActivities,
-    required this.recentTasks,
+    required this.tasks,
+    required this.subtasks,
     required this.summary,
+    required this.recentTasks,
   });
 
   factory DashboardStats.fromJson(Map<String, dynamic> json) {
     return DashboardStats(
-      totalTasks: json['totalTasks'] ?? 0,
-      completedTasks: json['completedTasks'] ?? 0,
-      pendingTasks: json['pendingTasks'] ?? 0,
-      inProgressTasks: json['inProgressTasks'] ?? 0,
-      delayedTasks: json['delayedTasks'] ?? 0,
-      teamMembers: json['teamMembers'] ?? 0,
-      activeCompanies: json['activeCompanies'] ?? 0,
-      productivity: json['productivity']?.toDouble() ?? 0.0,
-      chartData: List<ChartData>.from(
-        (json['chartData'] ?? []).map((x) => ChartData.fromJson(x)),
-      ),
-      recentActivities: List<RecentActivity>.from(
-        (json['recentActivities'] ?? []).map((x) => RecentActivity.fromJson(x)),
-      ),
+      tasks: Tasks.fromJson(json['tasks'] ?? {}),
+      subtasks: Subtasks.fromJson(json['subtasks'] ?? {}),
+      summary: Summary.fromJson(json['summary'] ?? {}),
       recentTasks: List<RecentTask>.from(
         (json['recentTasks'] ?? []).map((x) => RecentTask.fromJson(x)),
       ),
-      summary: Summary.fromJson(json['summary'] ?? {}),
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'tasks': tasks.toJson(),
+      'subtasks': subtasks.toJson(),
+      'summary': summary.toJson(),
+      'recentTasks': recentTasks.map((x) => x.toJson()).toList(),
+    };
   }
 }
 
-class ChartData {
-  final String name;
+class Tasks {
+  final int total;
   final int completed;
   final int pending;
   final int inProgress;
   final int delayed;
 
-  ChartData({
-    required this.name,
+  Tasks({
+    required this.total,
     required this.completed,
     required this.pending,
     required this.inProgress,
     required this.delayed,
   });
 
-  factory ChartData.fromJson(Map<String, dynamic> json) {
-    return ChartData(
-      name: json['name'] ?? '',
+  factory Tasks.fromJson(Map<String, dynamic> json) {
+    return Tasks(
+      total: json['total'] ?? 0,
       completed: json['completed'] ?? 0,
       pending: json['pending'] ?? 0,
       inProgress: json['inProgress'] ?? 0,
       delayed: json['delayed'] ?? 0,
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'total': total,
+      'completed': completed,
+      'pending': pending,
+      'inProgress': inProgress,
+      'delayed': delayed,
+    };
+  }
 }
 
-class RecentActivity {
-  final String id;
-  final String type;
-  final String user;
-  final String? task;
-  final String? target;
-  final String description;
-  final DateTime timestamp;
+class Subtasks {
+  final int total;
+  final int completed;
+  final int pending;
+  final int inProgress;
+  final int delayed;
 
-  RecentActivity({
-    required this.id,
-    required this.type,
-    required this.user,
-    this.task,
-    this.target,
-    required this.description,
-    required this.timestamp,
+  Subtasks({
+    required this.total,
+    required this.completed,
+    required this.pending,
+    required this.inProgress,
+    required this.delayed,
   });
 
-  factory RecentActivity.fromJson(Map<String, dynamic> json) {
-    return RecentActivity(
-      id: json['id'] ?? '',
-      type: json['type'] ?? '',
-      user: json['user'] ?? '',
-      task: json['task'],
-      target: json['target'],
-      description: json['description'] ?? '',
-      timestamp: DateTime.parse(json['timestamp'] ?? DateTime.now().toIso8601String()),
+  factory Subtasks.fromJson(Map<String, dynamic> json) {
+    return Subtasks(
+      total: json['total'] ?? 0,
+      completed: json['completed'] ?? 0,
+      pending: json['pending'] ?? 0,
+      inProgress: json['inProgress'] ?? 0,
+      delayed: json['delayed'] ?? 0,
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'total': total,
+      'completed': completed,
+      'pending': pending,
+      'inProgress': inProgress,
+      'delayed': delayed,
+    };
+  }
+}
+
+class Summary {
+  final int totalWork;
+  final int completedWork;
+  final double productivity;
+
+  Summary({
+    required this.totalWork,
+    required this.completedWork,
+    required this.productivity,
+  });
+
+  factory Summary.fromJson(Map<String, dynamic> json) {
+    return Summary(
+      totalWork: json['totalWork'] ?? 0,
+      completedWork: json['completedWork'] ?? 0,
+      productivity: (json['productivity'] ?? 0).toDouble(),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'totalWork': totalWork,
+      'completedWork': completedWork,
+      'productivity': productivity,
+    };
   }
 }
 
@@ -121,8 +144,11 @@ class RecentTask {
   final String priority;
   final String status;
   final int progress;
-  final List<SubTask> subTasks;
+  final List<dynamic> tags;
+  final List<Day> days;
   final DateTime createdAt;
+  final DateTime updatedAt;
+  final int version;
 
   RecentTask({
     required this.id,
@@ -136,8 +162,11 @@ class RecentTask {
     required this.priority,
     required this.status,
     required this.progress,
-    required this.subTasks,
+    required this.tags,
+    required this.days,
     required this.createdAt,
+    required this.updatedAt,
+    required this.version,
   });
 
   factory RecentTask.fromJson(Map<String, dynamic> json) {
@@ -153,11 +182,105 @@ class RecentTask {
       priority: json['priority'] ?? '',
       status: json['status'] ?? '',
       progress: json['progress'] ?? 0,
+      tags: json['tags'] ?? [],
+      days: List<Day>.from(
+        (json['days'] ?? []).map((x) => Day.fromJson(x)),
+      ),
+      createdAt: DateTime.parse(json['createdAt'] ?? DateTime.now().toIso8601String()),
+      updatedAt: DateTime.parse(json['updatedAt'] ?? DateTime.now().toIso8601String()),
+      version: json['__v'] ?? 0,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      '_id': id,
+      'title': title,
+      'description': description,
+      'company': company.toJson(),
+      'assignedTo': assignedTo.toJson(),
+      'assignedBy': assignedBy.toJson(),
+      'startDate': startDate.toIso8601String(),
+      'endDate': endDate.toIso8601String(),
+      'priority': priority,
+      'status': status,
+      'progress': progress,
+      'tags': tags,
+      'days': days.map((x) => x.toJson()).toList(),
+      'createdAt': createdAt.toIso8601String(),
+      'updatedAt': updatedAt.toIso8601String(),
+      '__v': version,
+    };
+  }
+}
+
+class Day {
+  final DateTime date;
+  final List<SubTask> subTasks;
+
+  Day({
+    required this.date,
+    required this.subTasks,
+  });
+
+  factory Day.fromJson(Map<String, dynamic> json) {
+    return Day(
+      date: DateTime.parse(json['date'] ?? DateTime.now().toIso8601String()),
       subTasks: List<SubTask>.from(
         (json['subTasks'] ?? []).map((x) => SubTask.fromJson(x)),
       ),
-      createdAt: DateTime.parse(json['createdAt'] ?? DateTime.now().toIso8601String()),
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'date': date.toIso8601String(),
+      'subTasks': subTasks.map((x) => x.toJson()).toList(),
+    };
+  }
+}
+
+class SubTask {
+  final String id;
+  final String description;
+  final int hoursSpent;
+  final String remarks;
+  final String status;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+
+  SubTask({
+    required this.id,
+    required this.description,
+    required this.hoursSpent,
+    required this.remarks,
+    required this.status,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+
+  factory SubTask.fromJson(Map<String, dynamic> json) {
+    return SubTask(
+      id: json['_id'] ?? '',
+      description: json['description'] ?? '',
+      hoursSpent: json['hoursSpent'] ?? 0,
+      remarks: json['remarks'] ?? '',
+      status: json['status'] ?? '',
+      createdAt: DateTime.parse(json['createdAt'] ?? DateTime.now().toIso8601String()),
+      updatedAt: DateTime.parse(json['updatedAt'] ?? DateTime.now().toIso8601String()),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      '_id': id,
+      'description': description,
+      'hoursSpent': hoursSpent,
+      'remarks': remarks,
+      'status': status,
+      'createdAt': createdAt.toIso8601String(),
+      'updatedAt': updatedAt.toIso8601String(),
+    };
   }
 }
 
@@ -165,7 +288,10 @@ class Company {
   final String id;
   final String name;
 
-  Company({required this.id, required this.name});
+  Company({
+    required this.id,
+    required this.name,
+  });
 
   factory Company.fromJson(Map<String, dynamic> json) {
     return Company(
@@ -173,82 +299,64 @@ class Company {
       name: json['name'] ?? '',
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      '_id': id,
+      'name': name,
+    };
+  }
 }
 
 class AssignedUser {
   final String id;
   final String name;
-  final String email;
+  final String? email;
 
   AssignedUser({
     required this.id,
     required this.name,
-    required this.email,
+    this.email,
   });
 
   factory AssignedUser.fromJson(Map<String, dynamic> json) {
     return AssignedUser(
       id: json['_id'] ?? '',
       name: json['name'] ?? '',
-      email: json['email'] ?? '',
+      email: json['email'],
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      '_id': id,
+      'name': name,
+      'email': email,
+    };
   }
 }
 
-class SubTask {
-  final String id;
-  final DateTime date;
-  final String description;
-  final String status;
-  final int hoursSpent;
-  final String remarks;
+// Helper class to parse the entire API response
+class DashboardResponse {
+  final bool success;
+  final DashboardStats data;
 
-  SubTask({
-    required this.id,
-    required this.date,
-    required this.description,
-    required this.status,
-    required this.hoursSpent,
-    required this.remarks,
+  DashboardResponse({
+    required this.success,
+    required this.data,
   });
 
-  factory SubTask.fromJson(Map<String, dynamic> json) {
-    return SubTask(
-      id: json['_id'] ?? '',
-      date: DateTime.parse(json['date'] ?? DateTime.now().toIso8601String()),
-      description: json['description'] ?? '',
-      status: json['status'] ?? '',
-      hoursSpent: json['hoursSpent'] ?? 0,
-      remarks: json['remarks'] ?? '',
+  factory DashboardResponse.fromJson(Map<String, dynamic> json) {
+    return DashboardResponse(
+      success: json['success'] ?? false,
+      data: DashboardStats.fromJson(json['data'] ?? {}),
     );
   }
-}
 
-class Summary {
-  final int total;
-  final int completed;
-  final int pending;
-  final int inProgress;
-  final int delayed;
-  final int completionRate;
-
-  Summary({
-    required this.total,
-    required this.completed,
-    required this.pending,
-    required this.inProgress,
-    required this.delayed,
-    required this.completionRate,
-  });
-
-  factory Summary.fromJson(Map<String, dynamic> json) {
-    return Summary(
-      total: json['total'] ?? 0,
-      completed: json['completed'] ?? 0,
-      pending: json['pending'] ?? 0,
-      inProgress: json['inProgress'] ?? 0,
-      delayed: json['delayed'] ?? 0,
-      completionRate: json['completionRate'] ?? 0,
-    );
+  Map<String, dynamic> toJson() {
+    return {
+      'success': success,
+      'data': data.toJson(),
+    };
   }
 }

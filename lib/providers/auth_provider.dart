@@ -323,6 +323,60 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
+  // Future<bool> login(String email, String password) async {
+  //   _isLoading = true;
+  //   _error = null;
+  //   notifyListeners();
+  //
+  //   try {
+  //     final response = await http.post(
+  //       Uri.parse('https://task-management-backend-bn2k.vercel.app/api/auth/login'),
+  //       headers: {'Content-Type': 'application/json'},
+  //       body: jsonEncode({'email': email, 'password': password}),
+  //     );
+  //
+  //     if (response.statusCode == 200) {
+  //       final data = jsonDecode(response.body);
+  //       print('=== LOGIN RESPONSE ===');
+  //       print('Full response: $data');
+  //
+  //       _token = data['token'];
+  //       _role = data['user']['role'];
+  //       _userId = data['user']['_id'];
+  //       _userName = data['user']['name'];
+  //       _companyId = data['user']['company']?['_id'];
+  //
+  //       final prefs = await SharedPreferences.getInstance();
+  //       await prefs.setString('token', _token!);
+  //       await prefs.setString('role', _role!);
+  //       await prefs.setString('userId', _userId!);
+  //       await prefs.setString('userName', _userName!);
+  //
+  //       // Also store the full user object as JSON
+  //       await prefs.setString('user', jsonEncode(data['user']));
+  //
+  //       // Store company ID if available
+  //       if (_companyId != null) {
+  //         await prefs.setString('companyId', _companyId!);
+  //       }
+  //
+  //       _isLoading = false;
+  //       notifyListeners();
+  //       return true;
+  //     } else {
+  //       final errorData = jsonDecode(response.body);
+  //       _error = errorData['message'] ?? 'Invalid email or password';
+  //       _isLoading = false;
+  //       notifyListeners();
+  //       return false;
+  //     }
+  //   } catch (e) {
+  //     _error = 'Network error: ${e.toString()}';
+  //     _isLoading = false;
+  //     notifyListeners();
+  //     return false;
+  //   }
+  // }
   Future<bool> login(String email, String password) async {
     _isLoading = true;
     _error = null;
@@ -342,9 +396,29 @@ class AuthProvider with ChangeNotifier {
 
         _token = data['token'];
         _role = data['user']['role'];
-        _userId = data['user']['_id'];
+        _userId = data['user']['_id'] ?? data['user']['id'];
         _userName = data['user']['name'];
-        _companyId = data['user']['company']?['_id'];
+
+        // Handle company field - it might not exist for admins
+        final companyField = data['user']['company'];
+        if (companyField != null) {
+          if (companyField is String) {
+            _companyId = companyField;
+          } else if (companyField is Map<String, dynamic>) {
+            _companyId = companyField['_id'];
+          } else {
+            _companyId = null;
+          }
+        } else {
+          _companyId = null;
+        }
+
+        print('=== EXTRACTED VALUES ===');
+        print('User ID: $_userId');
+        print('Role: $_role');
+        print('Company ID: $_companyId');
+        print('Is Admin: ${_role == 'admin'}');
+        print('Is Manager: ${_role == 'manager'}');
 
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString('token', _token!);
@@ -352,12 +426,15 @@ class AuthProvider with ChangeNotifier {
         await prefs.setString('userId', _userId!);
         await prefs.setString('userName', _userName!);
 
-        // Also store the full user object as JSON
+        // Store the full user object
         await prefs.setString('user', jsonEncode(data['user']));
 
-        // Store company ID if available
+        // Store company ID only if it exists
         if (_companyId != null) {
           await prefs.setString('companyId', _companyId!);
+        } else {
+          // Remove company ID if it doesn't exist (for admin)
+          await prefs.remove('companyId');
         }
 
         _isLoading = false;
@@ -408,4 +485,5 @@ class AuthProvider with ChangeNotifier {
     print('Company ID: ${prefs.getString('companyId')}');
     print('User JSON: ${prefs.getString('user')}');
   }
+
 }

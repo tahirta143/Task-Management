@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:taskflow_app/ApiLink.dart';
 import '../models/company_model.dart';
 
 class CompanyProvider with ChangeNotifier {
@@ -36,7 +37,7 @@ class CompanyProvider with ChangeNotifier {
       }
 
       final response = await http.get(
-        Uri.parse('https://task-management-backend-bn2k.vercel.app/api/companies'),
+        Uri.parse('${Apilink.api}/companies'),
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
@@ -191,15 +192,20 @@ class CompanyProvider with ChangeNotifier {
       }
 
       final response = await http.delete(
-        Uri.parse('https://task-management-backend-bn2k.vercel.app/api/companies/$id'),
+        Uri.parse(
+          'https://task-management-backend-bn2k.vercel.app/api/companies/$id',
+        ),
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
         },
       );
 
-      if (response.statusCode == 200) {
+      if (response.statusCode == 200 || response.statusCode == 204) {
+        // ✅ CORRECT REMOVE
         _companies.removeWhere((company) => company.id == id);
+
+        _successMessage = 'Company deleted successfully';
         _isLoading = false;
         notifyListeners();
         return true;
@@ -216,6 +222,7 @@ class CompanyProvider with ChangeNotifier {
       return false;
     }
   }
+
 
   Future<void> toggleCompanyStatus(String id, bool currentStatus) async {
     final company = _companies.firstWhere((c) => c.id == id);

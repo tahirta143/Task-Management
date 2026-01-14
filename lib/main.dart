@@ -27,10 +27,12 @@ import 'package:provider/provider.dart';
 import 'package:taskflow_app/providers/auth_provider.dart';
 import 'package:taskflow_app/providers/company_provider.dart';
 import 'package:taskflow_app/providers/dashboard_provider.dart';
+import 'package:taskflow_app/providers/report_provider.dart';
 import 'package:taskflow_app/providers/task_provider.dart';
 import 'package:taskflow_app/providers/user_provider.dart';
 import 'package:taskflow_app/screens/auth/login_screen.dart';
 import 'package:taskflow_app/screens/dashboard/dashboard_screen.dart';
+import 'package:taskflow_app/splash_screens/splash.dart';
 import 'package:taskflow_app/theme/app_theme.dart';
 import 'package:taskflow_app/utils/routes.dart';
 
@@ -44,6 +46,7 @@ void main() {
         ChangeNotifierProvider(create: (_) => CompanyProvider()),
         ChangeNotifierProvider(create: (_) => UserProvider()),
         ChangeNotifierProvider(create: (_) => TaskProvider()),
+        ChangeNotifierProvider(create: (_) => ReportProvider()),
       ],
       child: const MyApp(),
     ),
@@ -64,7 +67,7 @@ class MyApp extends StatelessWidget {
       home: Consumer<AuthProvider>(
         builder: (context, authProvider, _) {
           return authProvider.isAuthenticated
-              ? const DashboardScreen()
+              ? const Splashscreen()
               : const LoginScreen();
         },
       ),

@@ -64,19 +64,19 @@ class CompanyOverview extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 16),
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton.icon(
-              onPressed: () {},
-              icon: const Icon(Icons.add, size: 20),
-              label: const Text('Add New Company'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blue.shade50,
-                foregroundColor: Colors.blue,
-                elevation: 0,
-              ),
-            ),
-          ),
+          // SizedBox(
+          //   width: double.infinity,
+          //   child: ElevatedButton.icon(
+          //     onPressed: () {},
+          //     icon: const Icon(Icons.add, size: 20),
+          //     label: const Text('Add New Company'),
+          //     style: ElevatedButton.styleFrom(
+          //       backgroundColor: Colors.blue.shade50,
+          //       foregroundColor: Colors.blue,
+          //       elevation: 0,
+          //     ),
+          //   ),
+          // ),
         ],
       ),
     );

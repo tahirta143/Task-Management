@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:taskflow_app/splash_screens/splash.dart';
 
 import '../../providers/auth_provider.dart';
 
@@ -33,12 +34,27 @@ class _LoginScreenState extends State<LoginScreen> {
       );
 
       if (success) {
-        // Navigation handled in main.dart based on auth state
+        // Login successful - navigate to dashboard
+        print('Login successful! Navigating to dashboard...');
+
+        // Clear the error if any
+        authProvider.clearError();
+
+        // Add a small delay to ensure state is updated
+        await Future.delayed(const Duration(milliseconds: 100));
+
+        // Navigate to dashboard and remove login screen from stack
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (context) => Splashscreen()),
+              (route) => false, // Remove all previous routes
+        );
       } else {
+        // Show error message
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(authProvider.error ?? 'Login failed'),
             backgroundColor: Colors.red,
+            duration: const Duration(seconds: 3),
           ),
         );
       }

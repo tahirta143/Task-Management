@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import '../../models/dashboard_model.dart';
 
-
 class StatsGrid extends StatelessWidget {
   final DashboardStats stats;
   final bool isAdmin;
@@ -25,64 +24,64 @@ class StatsGrid extends StatelessWidget {
       children: [
         _buildStatCard(
           title: 'Total Tasks',
-          value: stats.totalTasks.toString(),
+          value: stats.tasks.total.toString(),
           icon: Icons.task_alt,
           color: Colors.blue,
         ),
         _buildStatCard(
           title: 'Completed',
-          value: stats.completedTasks.toString(),
+          value: stats.tasks.completed.toString(),
           icon: Icons.check_circle,
           color: Colors.green,
         ),
         _buildStatCard(
           title: 'In Progress',
-          value: stats.inProgressTasks.toString(),
+          value: stats.tasks.inProgress.toString(),
           icon: Icons.autorenew,
           color: Colors.orange,
         ),
         _buildStatCard(
           title: 'Pending',
-          value: stats.pendingTasks.toString(),
+          value: stats.tasks.pending.toString(),
           icon: Icons.pending_actions,
           color: Colors.yellow,
         ),
         _buildStatCard(
           title: 'Delayed',
-          value: stats.delayedTasks.toString(),
+          value: stats.tasks.delayed.toString(),
           icon: Icons.warning,
           color: Colors.red,
         ),
+        _buildStatCard(
+          title: 'Total Subtasks',
+          value: stats.subtasks.total.toString(),
+          icon: Icons.list,
+          color: Colors.purple,
+        ),
         if (isAdmin) ...[
           _buildStatCard(
-            title: 'Team Members',
-            value: stats.teamMembers.toString(),
-            icon: Icons.people,
-            color: Colors.purple,
-          ),
-          _buildStatCard(
-            title: 'Active Companies',
-            value: stats.activeCompanies.toString(),
-            icon: Icons.business,
+            title: 'Completed Subtasks',
+            value: stats.subtasks.completed.toString(),
+            icon: Icons.check_box,
             color: Colors.teal,
           ),
           _buildStatCard(
             title: 'Productivity',
-            value: '${stats.productivity}%',
+            value: '${stats.summary.productivity}%',
             icon: Icons.trending_up,
             color: Colors.green,
           ),
         ] else ...[
           _buildStatCard(
-            title: 'My Tasks',
-            value: stats.summary.total.toString(),
+            title: 'My Work',
+            value: stats.summary.totalWork.toString(),
             icon: Icons.assignment,
             color: Colors.blue,
           ),
           _buildStatCard(
-            title: 'Completion Rate',
-            value: '${stats.summary.completionRate}%',
-            icon: Icons.bar_chart,
+            title: 'Completed Work',
+            value: stats.summary.completedWork.toString(),
+            icon: Icons.assignment_turned_in,
             color: Colors.green,
           ),
         ],

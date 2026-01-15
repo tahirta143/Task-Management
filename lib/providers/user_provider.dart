@@ -127,15 +127,23 @@ class UserProvider with ChangeNotifier {
         'isActive': true,
       };
 
-      // Add password only for manager role
+      // IMPORTANT CHANGE: Add password for both manager and staff roles
+      // When password is provided, include it in the request
       if (password != null && password.isNotEmpty) {
         requestBody['password'] = password;
+      } else if (role == 'manager' || role == 'staff') {
+        // For manager and staff roles, password is required
+        // If not provided, let the backend handle it or show error
+        // You can uncomment the line below to require password
+        // throw Exception('Password is required for $role role');
       }
 
       // Add companyID if provided (for admin)
       if (companyID != null && companyID.isNotEmpty) {
-        requestBody['companyID'] = companyID;
+        requestBody['company'] = companyID; // Changed from 'companyID' to 'company'
       }
+
+      print('Creating user with request body: $requestBody');
 
       final response = await http.post(
         Uri.parse('https://task-management-backend-bn2k.vercel.app/api/users'),
@@ -145,6 +153,9 @@ class UserProvider with ChangeNotifier {
         },
         body: jsonEncode(requestBody),
       );
+
+      print('Response status: ${response.statusCode}');
+      print('Response body: ${response.body}');
 
       if (response.statusCode == 201) {
         // Refresh the user list

@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:taskflow_app/screens/Task/sub_task.dart';
-// import 'package:taskflow_app/screens/Task/subtask_list_screen.dart';
 import '../../models/task_model.dart';
 import '../../providers/auth_provider.dart';
+import 'package:provider/provider.dart';
 
 class TaskCard extends StatelessWidget {
   final Task task;
@@ -23,9 +22,10 @@ class TaskCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final isSmallPhone = screenWidth < 360;
-    final authProvider = Provider.of<AuthProvider>(context);
+    final isMediumPhone = screenWidth < 400;
 
-    // Check if user can edit/delete (only admin and manager)
+    // Get current user role for permission check
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
     final canEditDelete = authProvider.isAdmin || authProvider.isManager;
 
     return Container(
@@ -104,7 +104,7 @@ class TaskCard extends StatelessWidget {
                   // Description
                   if (!isSmallPhone || task.description.isNotEmpty)
                     Padding(
-                      padding: const EdgeInsets.only(bottom: 10),
+                      padding: const EdgeInsets.only(bottom: 12),
                       child: Text(
                         task.description,
                         style: TextStyle(
@@ -116,22 +116,19 @@ class TaskCard extends StatelessWidget {
                       ),
                     ),
 
-                  // Key Information Row - REMOVED COMPANY
+                  // Key Information Row (compressed on small screens)
                   if (isSmallPhone)
-                    _buildCompactInfoRow()
+                    _buildCompactInfoRow() // FIXED: Removed context parameter as it's not needed
                   else
-                    _buildDetailedInfo(),
+                    _buildDetailedInfo(context), // FIXED: Added context parameter
 
                   const SizedBox(height: 12),
 
-                  // Dates Row
-                  _buildDatesRow(isSmallPhone),
-
-                  // Progress and Status Row
-                  // _buildProgressStatusRow(isSmallPhone),
+                  // Progress Row with Edit/Delete buttons
+                  _buildProgressRow(context, isSmallPhone, canEditDelete),
 
                   // Sub-tasks summary
-                  if (task.subTasks.isNotEmpty)
+                  if (task.allSubTasks.isNotEmpty)
                     _buildSubTasksSummary(context, isSmallPhone),
 
                   // Tags (show only if there's space)
@@ -161,9 +158,9 @@ class TaskCard extends StatelessWidget {
                       ],
                     ),
 
-                  // Action buttons
-                  const SizedBox(height: 10),
-                  _buildActionButtons(context, isSmallPhone, canEditDelete),
+                  // Action buttons (only View Details remains)
+                  const SizedBox(height: 12),
+                  _buildActionButtons(context, isSmallPhone),
                 ],
               ),
             ),
@@ -173,7 +170,7 @@ class TaskCard extends StatelessWidget {
     );
   }
 
-  Widget _buildCompactInfoRow() {
+  Widget _buildCompactInfoRow() { // FIXED: Removed parameters as they're not used
     return Row(
       children: [
         Icon(Icons.person_outline, size: 14, color: Colors.grey[500]),
@@ -189,45 +186,14 @@ class TaskCard extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
           ),
         ),
-        // REMOVED COMPANY ICON AND TEXT
-      ],
-    );
-  }
-
-  Widget _buildDetailedInfo() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Assigned to only - REMOVED COMPANY
-        Row(
-          children: [
-            Icon(Icons.person_outline, size: 16, color: Colors.grey[500]),
-            const SizedBox(width: 8),
-            Text(
-              'Assigned to: ${task.assignedTo.name}',
-              style: TextStyle(
-                color: Colors.grey[600],
-                fontSize: 13,
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 2),
-      ],
-    );
-  }
-
-  Widget _buildDatesRow(bool isSmallPhone) {
-    return Row(
-      children: [
-        Icon(Icons.calendar_today_outlined, size: isSmallPhone ? 14 : 16, color: Colors.grey[500]),
-        const SizedBox(width: 8),
+        Icon(Icons.business_outlined, size: 14, color: Colors.grey[500]),
+        const SizedBox(width: 4),
         Expanded(
           child: Text(
-            '${_formatDate(task.startDate)} - ${_formatDate(task.endDate)}',
+            task.company.name,
             style: TextStyle(
               color: Colors.grey[600],
-              fontSize: isSmallPhone ? 12 : 13,
+              fontSize: 12,
             ),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
@@ -237,43 +203,204 @@ class TaskCard extends StatelessWidget {
     );
   }
 
-  // Widget _buildProgressStatusRow(bool isSmallPhone) {
-  //   return Container(
-  //     margin: const EdgeInsets.only(top: 12),
-  //     child: Row(
-  //       children: [
-  //         Expanded(
-  //           child: Column(
-  //             crossAxisAlignment: CrossAxisAlignment.start,
-  //             children: [
-  //               Text(
-  //                 'Progress: ${task.progress}%',
-  //                 style: TextStyle(
-  //                   fontSize: isSmallPhone ? 12 : 13,
-  //                   fontWeight: FontWeight.w500,
-  //                 ),
-  //               ),
-  //               const SizedBox(height: 4),
-  //               LinearProgressIndicator(
-  //                 value: task.progress / 100,
-  //                 backgroundColor: Colors.grey[200],
-  //                 color: _getStatusColor(task.status),
-  //                 minHeight: 6,
-  //                 borderRadius: BorderRadius.circular(3),
-  //               ),
-  //             ],
-  //           ),
-  //         ),
-  //         const SizedBox(width: 12),
-  //         _buildStatusBadge(task.status, isSmallPhone),
-  //       ],
-  //     ),
-  //   );
-  // }
+  Widget _buildDetailedInfo(BuildContext context) { // FIXED: Added context parameter
+    final screenWidth = MediaQuery.of(context).size.width; // FIXED: Now has access to context
+    final isMobile = screenWidth < 600;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Assigned to row
+        Row(
+          children: [
+            Icon(
+              Icons.person_outline,
+              size: isMobile ? 14 : 16,
+              color: Colors.grey[500],
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                'Assigned to: ${task.assignedTo.name}',
+                style: TextStyle(
+                  color: Colors.grey[600],
+                  fontSize: isMobile ? 12 : 13,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 6),
+
+        // Company row
+        // Row(
+        //   children: [
+        //     Icon(
+        //       Icons.business_outlined,
+        //       size: isMobile ? 14 : 16,
+        //       color: Colors.grey[500],
+        //     ),
+        //     const SizedBox(width: 8),
+        //     Expanded(
+        //       child: Text(
+        //         'Company: ${task.company.name}',
+        //         style: TextStyle(
+        //           color: Colors.grey[600],
+        //           fontSize: isMobile ? 12 : 13,
+        //         ),
+        //         maxLines: 1,
+        //         overflow: TextOverflow.ellipsis,
+        //       ),
+        //     ),
+        //   ],
+        // ),
+        // const SizedBox(height: 6),
+
+        // Dates row
+        Row(
+          children: [
+            Icon(
+              Icons.calendar_today_outlined,
+              size: isMobile ? 14 : 16,
+              color: Colors.grey[500],
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                '${_formatDate(task.startDate)} - ${_formatDate(task.endDate)}',
+                style: TextStyle(
+                  color: Colors.grey[600],
+                  fontSize: isMobile ? 12 : 13,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildProgressRow(BuildContext context, bool isSmallPhone, bool canEditDelete) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isMediumPhone = screenWidth < 400;
+
+    // Calculate progress if needed
+    final allSubTasks = task.allSubTasks;
+    final totalSubTasks = allSubTasks.length;
+    final completedSubTasks = allSubTasks.where((st) => st.status == 'completed').length;
+    final progressPercentage = totalSubTasks > 0 ? (completedSubTasks / totalSubTasks * 100).toInt() : 0;
+
+    return Container(
+      margin: const EdgeInsets.only(top: 8),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          // Progress indicator and text
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Text(
+                      'Progress: ',
+                      style: TextStyle(
+                        fontSize: isSmallPhone ? 12 : 13,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.grey[700],
+                      ),
+                    ),
+                    Text(
+                      '$progressPercentage%',
+                      style: TextStyle(
+                        fontSize: isSmallPhone ? 12 : 13,
+                        fontWeight: FontWeight.w600,
+                        color: _getProgressColor(progressPercentage),
+                      ),
+                    ),
+                    if (totalSubTasks > 0) ...[
+                      SizedBox(width: isSmallPhone ? 4 : 8),
+                      Text(
+                        '($completedSubTasks/$totalSubTasks)',
+                        style: TextStyle(
+                          fontSize: isSmallPhone ? 10 : 11,
+                          color: Colors.grey[500],
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+                const SizedBox(height: 4),
+                LinearProgressIndicator(
+                  value: progressPercentage / 100,
+                  backgroundColor: Colors.grey[200],
+                  color: _getProgressColor(progressPercentage),
+                  minHeight: isSmallPhone ? 4 : 6,
+                  borderRadius: BorderRadius.circular(3),
+                ),
+              ],
+            ),
+          ),
+
+          // Edit/Delete buttons (only for admin/manager)
+          if (canEditDelete && (onEdit != null || onDelete != null)) ...[
+            SizedBox(width: isSmallPhone ? 8 : 12),
+            Wrap(
+              spacing: isSmallPhone ? 6 : 8,
+              children: [
+                // Edit Button
+                if (onEdit != null)
+                  GestureDetector(
+                    onTap: onEdit,
+                    child: Container(
+                      padding: EdgeInsets.all(isSmallPhone ? 6 : 8),
+                      decoration: BoxDecoration(
+                        color: Colors.orange.shade50,
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: Colors.orange.shade100),
+                      ),
+                      child: Icon(
+                        Icons.edit_outlined,
+                        size: isSmallPhone ? 16 : 18,
+                        color: Colors.orange.shade600,
+                      ),
+                    ),
+                  ),
+
+                // Delete Button
+                if (onDelete != null)
+                  GestureDetector(
+                    onTap: onDelete,
+                    child: Container(
+                      padding: EdgeInsets.all(isSmallPhone ? 6 : 8),
+                      decoration: BoxDecoration(
+                        color: Colors.red.shade50,
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: Colors.red.shade100),
+                      ),
+                      child: Icon(
+                        Icons.delete_outline,
+                        size: isSmallPhone ? 16 : 18,
+                        color: Colors.red.shade600,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          ],
+        ],
+      ),
+    );
+  }
 
   Widget _buildSubTasksSummary(BuildContext context, bool isSmallPhone) {
-    final completedSubTasks = task.subTasks.where((st) => st.status == 'completed').length;
-    final totalHours = task.subTasks.fold(0, (sum, st) => sum + st.hoursSpent);
+    final allSubTasks = task.allSubTasks;
+    final completedSubTasks = allSubTasks.where((st) => st.status == 'completed').length;
+    final totalHours = allSubTasks.fold(0, (sum, st) => sum + st.hoursSpent);
 
     return GestureDetector(
       onTap: () {
@@ -305,7 +432,7 @@ class TaskCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    '${task.subTasks.length} Progress Items',
+                    '${allSubTasks.length} Progress Items',
                     style: TextStyle(
                       fontSize: isSmallPhone ? 12 : 14,
                       fontWeight: FontWeight.w500,
@@ -325,7 +452,7 @@ class TaskCard extends StatelessWidget {
             ),
             if (isSmallPhone)
               Text(
-                '$completedSubTasks/${task.subTasks.length}',
+                '$completedSubTasks/${allSubTasks.length}',
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
@@ -343,13 +470,13 @@ class TaskCard extends StatelessWidget {
     );
   }
 
-  Widget _buildActionButtons(BuildContext context, bool isSmallPhone, bool canEditDelete) {
+  Widget _buildActionButtons(BuildContext context, bool isSmallPhone) {
     final screenWidth = MediaQuery.of(context).size.width;
     final hasSpaceForText = screenWidth > 400;
 
     return Row(
       children: [
-        // View Details Button - Always visible for all users
+        // Only View Details button remains
         Expanded(
           child: ElevatedButton.icon(
             onPressed: onViewDetails ?? () {
@@ -361,13 +488,13 @@ class TaskCard extends StatelessWidget {
               );
             },
             icon: const Icon(Icons.visibility_outlined, size: 16),
-            label: hasSpaceForText ? const Text('View Progress') : const SizedBox.shrink(),
+            label: hasSpaceForText ? const Text('View Details') : const SizedBox.shrink(),
             style: ElevatedButton.styleFrom(
               foregroundColor: Colors.blue[600],
               backgroundColor: Colors.blue[50],
               padding: EdgeInsets.symmetric(
-                horizontal: isSmallPhone ? 6 : 10,
-                vertical: isSmallPhone ? 6 : 8,
+                horizontal: isSmallPhone ? 8 : 12,
+                vertical: isSmallPhone ? 8 : 10,
               ),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
@@ -376,112 +503,7 @@ class TaskCard extends StatelessWidget {
             ),
           ),
         ),
-
-        // Edit Button - Only for admin and manager
-        if (canEditDelete) ...[
-          const SizedBox(width: 8),
-          Container(
-            width: isSmallPhone ? 40 : null,
-            child: ElevatedButton(
-              onPressed: onEdit ?? () {
-                // Show dialog or navigate to edit screen
-                _showEditDialog(context);
-              },
-              style: ElevatedButton.styleFrom(
-                foregroundColor: Colors.orange[600],
-                backgroundColor: Colors.orange[50],
-                padding: EdgeInsets.symmetric(
-                  horizontal: isSmallPhone ? 8 : 12,
-                  vertical: isSmallPhone ? 8 : 10,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                elevation: 0,
-              ),
-              child: isSmallPhone
-                  ? const Icon(Icons.edit, size: 16)
-                  : const Text('Edit'),
-            ),
-          ),
-        ],
-
-        // Delete Button - Only for admin and manager
-        if (canEditDelete) ...[
-          const SizedBox(width: 8),
-          Container(
-            width: isSmallPhone ? 40 : null,
-            child: ElevatedButton(
-              onPressed: onDelete ?? () {
-                // Show confirmation dialog
-                _showDeleteDialog(context);
-              },
-              style: ElevatedButton.styleFrom(
-                foregroundColor: Colors.red[600],
-                backgroundColor: Colors.red[50],
-                padding: EdgeInsets.symmetric(
-                  horizontal: isSmallPhone ? 8 : 12,
-                  vertical: isSmallPhone ? 8 : 10,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                elevation: 0,
-              ),
-              child: isSmallPhone
-                  ? const Icon(Icons.delete_outline, size: 16)
-                  : const Text('Delete'),
-            ),
-          ),
-        ],
       ],
-    );
-  }
-
-  void _showEditDialog(BuildContext context) {
-    // Implement edit dialog or navigation to edit screen
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Edit Task'),
-        content: const Text('Edit functionality to be implemented'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () {
-              // Call your edit API here
-              Navigator.pop(context);
-            },
-            child: const Text('Save'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showDeleteDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Delete Task'),
-        content: const Text('Are you sure you want to delete this task?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () {
-              // Call your delete API here
-              Navigator.pop(context);
-            },
-            child: const Text('Delete', style: TextStyle(color: Colors.red)),
-          ),
-        ],
-      ),
     );
   }
 
@@ -519,40 +541,6 @@ class TaskCard extends StatelessWidget {
     );
   }
 
-  Widget _buildStatusBadge(String status, bool isSmallPhone) {
-    final statusColors = {
-      'pending': Colors.orange,
-      'in-progress': Colors.blue,
-      'completed': Colors.green,
-    };
-
-    final statusText = {
-      'pending': isSmallPhone ? 'Pend' : 'Pending',
-      'in-progress': isSmallPhone ? 'Progress' : 'In Progress',
-      'completed': isSmallPhone ? 'Done' : 'Completed',
-    };
-
-    return Container(
-      padding: EdgeInsets.symmetric(
-        horizontal: isSmallPhone ? 6 : 10,
-        vertical: isSmallPhone ? 2 : 4,
-      ),
-      decoration: BoxDecoration(
-        color: statusColors[status]!.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(isSmallPhone ? 6 : 12),
-        border: Border.all(color: statusColors[status]!),
-      ),
-      child: Text(
-        statusText[status]!,
-        style: TextStyle(
-          color: statusColors[status],
-          fontSize: isSmallPhone ? 10 : 11,
-          fontWeight: FontWeight.w600,
-        ),
-      ),
-    );
-  }
-
   Color _getPriorityColor(String priority) {
     switch (priority) {
       case 'low':
@@ -566,18 +554,12 @@ class TaskCard extends StatelessWidget {
     }
   }
 
-  // Color _getStatusColor(String status) {
-  //   switch (status) {
-  //     case 'pending':
-  //       return Colors.orange;
-  //     case 'in-progress':
-  //       return Colors.blue;
-  //     case 'completed':
-  //       return Colors.green;
-  //     default:
-  //       return Colors.grey;
-  //   }
-  // }
+  Color _getProgressColor(int progress) {
+    if (progress >= 100) return Colors.green;
+    if (progress >= 50) return Colors.blue;
+    if (progress > 0) return Colors.orange;
+    return Colors.grey;
+  }
 
   String _formatDate(DateTime date) {
     return '${date.day}/${date.month}/${date.year}';

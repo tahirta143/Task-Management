@@ -1037,7 +1037,11 @@ class _AddStaffScreenState extends State<AddStaffScreen> {
                       SizedBox(height: 16),
 
                       // Password Field (only for admin creating manager)
-                      if (authProvider.isAdmin && _selectedRole == 'manager')
+                      // In the build method, update the password field section:
+
+// Password Field (only for admin creating manager OR staff)
+                      // Password Field (only for admin creating manager OR staff)
+                      if (authProvider.isAdmin && (_selectedRole == 'manager' || _selectedRole == 'staff'))
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -1055,7 +1059,9 @@ class _AddStaffScreenState extends State<AddStaffScreen> {
                               style: TextStyle(fontSize: isSmallScreen ? 15 : 16),
                               obscureText: true,
                               decoration: InputDecoration(
-                                hintText: 'Enter password for manager',
+                                hintText: _selectedRole == 'manager'
+                                    ? 'Enter password for manager'
+                                    : 'Enter password for staff',
                                 prefixIcon: Icon(Icons.lock_outline_rounded, color: Colors.grey[500]),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(10),
@@ -1075,9 +1081,9 @@ class _AddStaffScreenState extends State<AddStaffScreen> {
                                 ),
                               ),
                               validator: (value) {
-                                if (authProvider.isAdmin && _selectedRole == 'manager') {
+                                if (authProvider.isAdmin && (_selectedRole == 'manager' || _selectedRole == 'staff')) {
                                   if (value == null || value.isEmpty) {
-                                    return 'Password is required for manager';
+                                    return 'Password is required for ${_selectedRole!}';
                                   }
                                   if (value.length < 6) {
                                     return 'Password must be at least 6 characters';
@@ -1089,7 +1095,6 @@ class _AddStaffScreenState extends State<AddStaffScreen> {
                             SizedBox(height: 16),
                           ],
                         ),
-
                       // Phone Number Field
                       Text(
                         'Phone Number',

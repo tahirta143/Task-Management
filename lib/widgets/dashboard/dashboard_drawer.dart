@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:taskflow_app/screens/auth/login_screen.dart';
 import '../../providers/auth_provider.dart';
+import '../../screens/profile/profile_screen.dart';
 
 class DashboardDrawer extends StatelessWidget {
   final Function(int) onMenuItemSelected;
@@ -177,9 +178,19 @@ class DashboardDrawer extends StatelessWidget {
                   label: item['label'],
                   onTap: () {
                     Navigator.pop(context); // Close drawer
-                    onMenuItemSelected(item['route']);
+
+                    // Check if this is the Settings menu
+                    if (item['label'] == 'Settings') {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const ProfileScreen()),
+                      );
+                    } else {
+                      onMenuItemSelected(item['route']); // default behavior
+                    }
                   },
-                )),
+                ))
+
               ],
             ),
           ),

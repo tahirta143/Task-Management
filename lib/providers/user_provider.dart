@@ -256,20 +256,35 @@ class UserProvider with ChangeNotifier {
         },
       );
 
-      if (response.statusCode == 200) {
-        // Remove user from list
+      print('Delete API Response - Status: ${response.statusCode}');
+      print('Delete API Response - Body: ${response.body}');
+
+      if (response.statusCode == 200 || response.statusCode == 204) {
+        // Remove the user from the main list
+        final initialCount = _users.length;
         _users.removeWhere((user) => user.id == id);
+        print('Removed user $id from _users list. Before: $initialCount, After: ${_users.length}');
+
+        // IMPORTANT: Re-apply filters to update _filteredUsers
         _applyFilters();
+
+        print('Filters applied. Filtered users count: ${_filteredUsers.length}');
+
         return true;
       } else {
-        throw Exception('Failed to delete user');
+        final data = jsonDecode(response.body);
+        final errorMessage = data['message'] ?? 'Failed to delete user (Status: ${response.statusCode})';
+        print('Delete failed: $errorMessage');
+        throw Exception(errorMessage);
       }
     } catch (e) {
       _error = e.toString();
+      print('Delete error caught: $_error');
       return false;
     } finally {
       _isLoading = false;
       notifyListeners();
+      print('Delete operation completed. isLoading: $_isLoading');
     }
   }
 }

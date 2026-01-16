@@ -544,18 +544,18 @@ class _UsersScreenState extends State<UsersScreen> {
                   // Navigate to edit user
                 },
               ),
-              if (user.role != 'admin')
-                ListTile(
-                  leading: Icon(
-                    user.isActive ? Icons.block : Icons.check_circle,
-                    color: user.isActive ? Colors.orange : Colors.green,
-                  ),
-                  title: Text(user.isActive ? 'Deactivate User' : 'Activate User'),
-                  onTap: () {
-                    Navigator.pop(context);
-                    // Toggle user active status
-                  },
-                ),
+              // if (user.role != 'admin')
+              //   ListTile(
+              //     leading: Icon(
+              //       user.isActive ? Icons.block : Icons.check_circle,
+              //       color: user.isActive ? Colors.orange : Colors.green,
+              //     ),
+              //     title: Text(user.isActive ? 'Deactivate User' : 'Activate User'),
+              //     onTap: () {
+              //       Navigator.pop(context);
+              //       // Toggle user active status
+              //     },
+              //   ),
               ListTile(
                 leading: const Icon(Icons.delete, color: Colors.red),
                 title: const Text('Delete User'),
@@ -571,72 +571,61 @@ class _UsersScreenState extends State<UsersScreen> {
     );
   }
 
-  // void _showDeleteDialog(BuildContext context, User user) {
-  //   showDialog(
-  //     context: context,
-  //     builder: (context) => AlertDialog(
-  //       title: const Text('Delete User'),
-  //       content: Text('Are you sure you want to delete ${user.name}?'),
-  //       actions: [
-  //         TextButton(
-  //           onPressed: () => Navigator.pop(context),
-  //           child: const Text('Cancel'),
-  //         ),
-  //         TextButton(
-  //           onPressed: () {
-  //             Navigator.pop(context);
-  //             // Delete user logic
-  //           },
-  //           child: const Text(
-  //             'Delete',
-  //             style: TextStyle(color: Colors.red),
-  //           ),
-  //         ),
-  //       ],
-  //     ),
-  //   );
-  // }
+  //
   void _showDeleteDialog(BuildContext context, User user) {
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (context) {
-        return AlertDialog(
-          title: const Text('Delete User'),
-          content: Text('Are you sure you want to delete ${user.name}?'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel'),
-            ),
-
-            Consumer<UserProvider>(
-              builder: (context, userProvider, _) {
-                return TextButton(
+        return Consumer<UserProvider>(
+          builder: (context, userProvider, _) {
+            return AlertDialog(
+              title: const Text('Delete User'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text('Are you sure you want to delete ${user.name}?'),
+                  const SizedBox(height: 8),
+                  if (userProvider.error != null && userProvider.error!.contains('assigned tasks'))
+                    Text(
+                      'Note: This user has tasks assigned to them. You need to reassign or delete those tasks first.',
+                      style: TextStyle(
+                        color: Colors.orange[800],
+                        fontSize: 12,
+                      ),
+                    ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('Cancel'),
+                ),
+                TextButton(
                   onPressed: userProvider.isLoading
                       ? null
                       : () async {
-                    final success =
-                    await userProvider.deleteUser(user.id);
+                    final success = await userProvider.deleteUser(user.id);
 
                     if (success && context.mounted) {
-                      Navigator.pop(context); // close dialog
-
+                      Navigator.pop(context);
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
                           content: Text('User deleted successfully'),
                           backgroundColor: Colors.green,
                         ),
                       );
-                    } else {
-                      Navigator.pop(context);
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(
-                              userProvider.error ?? 'Delete failed'),
-                          backgroundColor: Colors.red,
-                        ),
-                      );
+                    } else if (context.mounted) {
+                      // Don't close dialog on error, show error in dialog
+                      if (userProvider.error != null && userProvider.error!.contains('assigned tasks')) {
+                        // Show detailed error but keep dialog open
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: const Text('Cannot delete user with assigned tasks'),
+                            backgroundColor: Colors.orange,
+                          ),
+                        );
+                      }
                     }
                   },
                   child: userProvider.isLoading
@@ -649,10 +638,10 @@ class _UsersScreenState extends State<UsersScreen> {
                     'Delete',
                     style: TextStyle(color: Colors.red),
                   ),
-                );
-              },
-            ),
-          ],
+                ),
+              ],
+            );
+          },
         );
       },
     );

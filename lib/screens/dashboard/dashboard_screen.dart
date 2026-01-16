@@ -114,6 +114,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final dashboardProvider = Provider.of<DashboardProvider>(context);
 
     return Scaffold(
+      extendBody: true,
       appBar: DashboardAppBar(
         userName: authProvider.userName ?? 'User',
         role: authProvider.role ?? 'staff',

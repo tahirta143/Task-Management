@@ -35,6 +35,7 @@ class _OnBoardingScreensState extends State<OnBoardingScreens> {
     ),
   ];
   void _skip() {
+    _onFinish();
     _pageController.animateToPage(
       _pages.length - 1,
       duration: Duration(milliseconds: 500),

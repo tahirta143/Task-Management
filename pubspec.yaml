@@ -44,7 +44,7 @@ dependencies:
   fl_chart: ^0.66.0
   percent_indicator: ^4.2.3
   google_fonts: ^6.1.0
-
+  curved_bottom_navigation_bar:
   dropdown_button2: ^2.3.3
   flutter_launcher_icons: ^0.14.4
   smooth_page_indicator: ^2.0.1

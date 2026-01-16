@@ -27,6 +27,7 @@ import 'package:provider/provider.dart';
 import 'package:taskflow_app/providers/auth_provider.dart';
 import 'package:taskflow_app/providers/company_provider.dart';
 import 'package:taskflow_app/providers/dashboard_provider.dart';
+import 'package:taskflow_app/providers/password_provider.dart';
 import 'package:taskflow_app/providers/report_provider.dart';
 import 'package:taskflow_app/providers/task_provider.dart';
 import 'package:taskflow_app/providers/user_provider.dart';
@@ -47,6 +48,7 @@ void main() {
         ChangeNotifierProvider(create: (_) => UserProvider()),
         ChangeNotifierProvider(create: (_) => TaskProvider()),
         ChangeNotifierProvider(create: (_) => ReportProvider()),
+        ChangeNotifierProvider(create: (_) => PasswordProvider()),
       ],
       child: const MyApp(),
     ),

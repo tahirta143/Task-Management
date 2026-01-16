@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:taskflow_app/screens/Task/sub_task_dialog.dart';
 import '../../models/task_model.dart';
 import '../../providers/task_provider.dart';
@@ -18,18 +19,34 @@ class _SubTaskListScreenState extends State<SubTaskListScreen> {
   late Task _currentTask;
   bool _isRefreshing = false;
   bool _isDisposed = false;
+  bool _isLoading = false; // Add for shimmer
   Map<String, List<SubTask>> _groupedSubTasks = {};
-  String? _selectedDateKey; // Store selected date key for status change
+  String? _selectedDateKey;
 
   @override
   void initState() {
     super.initState();
     _currentTask = widget.task;
     _isDisposed = false;
+    _isLoading = true; // Start with loading
     _groupedSubTasks = _groupSubTasksByDate();
+
+    // Load data with shimmer
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _refreshTaskData();
+      _loadInitialData();
     });
+  }
+
+  Future<void> _loadInitialData() async {
+    if (!isMounted) return;
+
+    await Future.delayed(const Duration(milliseconds: 500)); // Simulate loading
+    if (isMounted) {
+      setState(() {
+        _isLoading = false;
+      });
+      await _refreshTaskData();
+    }
   }
 
   @override
@@ -51,22 +68,17 @@ class _SubTaskListScreenState extends State<SubTaskListScreen> {
         orElse: () => widget.task,
       );
 
-      if (_currentTask.id != updatedTask.id ||
-          _currentTask.allSubTasks.length != updatedTask.allSubTasks.length ||
-          _currentTask.days.length != updatedTask.days.length) {
-        if (isMounted) {
-          setState(() {
-            _currentTask = updatedTask;
-            _groupedSubTasks = _groupSubTasksByDate();
-          });
-        }
+      if (isMounted) {
+        setState(() {
+          _currentTask = updatedTask;
+          _groupedSubTasks = _groupSubTasksByDate();
+        });
       }
     } catch (e) {
       print('Error updating task from provider: $e');
     }
   }
 
-  // Group sub-tasks by date
   Map<String, List<SubTask>> _groupSubTasksByDate() {
     final Map<String, List<SubTask>> grouped = {};
 
@@ -78,7 +90,6 @@ class _SubTaskListScreenState extends State<SubTaskListScreen> {
     return grouped;
   }
 
-  // Get date key for a specific sub-task
   String? _getDateKeyForSubTask(SubTask subTask) {
     for (final entry in _groupedSubTasks.entries) {
       if (entry.value.contains(subTask)) {
@@ -88,7 +99,6 @@ class _SubTaskListScreenState extends State<SubTaskListScreen> {
     return null;
   }
 
-  // Get all sub-tasks from all days
   List<SubTask> get _allSubTasks {
     return _currentTask.days.expand((day) => day.subTasks).toList();
   }
@@ -120,68 +130,58 @@ class _SubTaskListScreenState extends State<SubTaskListScreen> {
     }
   }
 
-  // Check if current user is the assigned user of the task
-  // Since SubTask doesn't have userId, we assume it belongs to task's assigned user
+  Future<void> _refreshWithShimmer() async {
+    if (!isMounted) return;
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    await _refreshTaskData();
+
+    if (isMounted) {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
   bool _isTaskAssignedUser(AuthProvider authProvider) {
     return authProvider.userId == _currentTask.assignedTo.id;
   }
 
-  // Check permissions based on role
   bool _canEditSubTask(AuthProvider authProvider) {
-    // Admin can edit any sub-task
     if (authProvider.isAdmin) return true;
-
-    // Staff can edit if they are the assigned user of the task
     if (authProvider.isStaff) {
       return _isTaskAssignedUser(authProvider);
     }
-
     return false;
   }
 
   bool _canDeleteSubTask(AuthProvider authProvider) {
-    // Admin can delete any sub-task
     if (authProvider.isAdmin) return true;
-
-    // Staff can delete if they are the assigned user of the task
     if (authProvider.isStaff) {
       return _isTaskAssignedUser(authProvider);
     }
-
     return false;
   }
 
   bool _canChangeStatus(AuthProvider authProvider) {
-    // Admin can change any status
     if (authProvider.isAdmin) return true;
-
-    // Manager can change status if they belong to the same company
     if (authProvider.isManager) {
       return authProvider.companyId == _currentTask.company.id;
     }
-
-    // Staff can change status if they are the assigned user of the task
-    if (authProvider.isStaff) {
-      return _isTaskAssignedUser(authProvider);
-    }
-
     return false;
   }
 
   bool _canAddSubTask(AuthProvider authProvider) {
-    // Admin can add any sub-task
     if (authProvider.isAdmin) return true;
-
-    // Manager can add if same company
     if (authProvider.isManager) {
       return authProvider.companyId == _currentTask.company.id;
     }
-
-    // Staff can add if they are the assigned user of the task
     if (authProvider.isStaff) {
       return _isTaskAssignedUser(authProvider);
     }
-
     return false;
   }
 
@@ -202,7 +202,6 @@ class _SubTaskListScreenState extends State<SubTaskListScreen> {
   @override
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthProvider>(context);
-    final allSubTasks = _allSubTasks;
     final canEdit = _canEditSubTask(authProvider);
     final canDelete = _canDeleteSubTask(authProvider);
     final canChangeStatus = _canChangeStatus(authProvider);
@@ -234,16 +233,258 @@ class _SubTaskListScreenState extends State<SubTaskListScreen> {
             ),
         ],
       ),
-      body: _currentTask.days.isEmpty || _allSubTasks.isEmpty
+      body: _isLoading
+          ? _buildShimmerLoading()
+          : _currentTask.days.isEmpty || _allSubTasks.isEmpty
           ? _buildEmptyState(authProvider, canAdd)
           : _buildSubTaskList(authProvider, canEdit, canDelete, canChangeStatus, isAssignedUser),
-      floatingActionButton: canAdd
+      floatingActionButton: canAdd && !_isLoading
           ? FloatingActionButton(
         onPressed: () => _showAddSubTaskDialog(authProvider),
         child: const Icon(Icons.add),
         tooltip: 'Add Progress',
       )
           : null,
+    );
+  }
+
+  Widget _buildShimmerLoading() {
+    return SingleChildScrollView(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: [
+            // Shimmer Statistics Card
+            _buildShimmerStatisticsCard(),
+            const SizedBox(height: 16),
+
+            // Shimmer Task Info Card
+            _buildShimmerTaskInfoCard(),
+            const SizedBox(height: 16),
+
+            // Shimmer Date Headers with Sub-tasks
+            for (int i = 0; i < 3; i++) ...[
+              _buildShimmerDateHeader(),
+              const SizedBox(height: 8),
+              for (int j = 0; j < 2; j++)
+                _buildShimmerSubTaskCard(),
+              const SizedBox(height: 16),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildShimmerStatisticsCard() {
+    return Shimmer.fromColors(
+      baseColor: Colors.grey[300]!,
+      highlightColor: Colors.grey[100]!,
+      child: Card(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                width: 150,
+                height: 20,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(4),
+                ),
+              ),
+              const SizedBox(height: 12),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  _buildShimmerStatCircle(),
+                  _buildShimmerStatCircle(),
+                  _buildShimmerStatCircle(),
+                  _buildShimmerStatCircle(),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  Container(
+                    width: 16,
+                    height: 16,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Container(
+                    width: 100,
+                    height: 16,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildShimmerStatCircle() {
+    return Column(
+      children: [
+        Container(
+          width: 40,
+          height: 40,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            shape: BoxShape.circle,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Container(
+          width: 30,
+          height: 10,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(4),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildShimmerTaskInfoCard() {
+    return Shimmer.fromColors(
+      baseColor: Colors.grey[300]!,
+      highlightColor: Colors.grey[100]!,
+      child: Card(
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                width: 120,
+                height: 16,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(4),
+                ),
+              ),
+              const SizedBox(height: 4),
+              Container(
+                width: 80,
+                height: 14,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(4),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildShimmerDateHeader() {
+    return Shimmer.fromColors(
+      baseColor: Colors.grey[300]!,
+      highlightColor: Colors.grey[100]!,
+      child: Container(
+        width: 120,
+        height: 20,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(4),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildShimmerSubTaskCard() {
+    return Shimmer.fromColors(
+      baseColor: Colors.grey[300]!,
+      highlightColor: Colors.grey[100]!,
+      child: Card(
+        margin: const EdgeInsets.only(bottom: 8),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            children: [
+              // Circle with hours
+              Container(
+                width: 50,
+                height: 50,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  shape: BoxShape.circle,
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      width: double.infinity,
+                      height: 16,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Container(
+                      width: 80,
+                      height: 12,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Container(
+                      width: double.infinity,
+                      height: 12,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        Container(
+                          width: 60,
+                          height: 20,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                        const Spacer(),
+                        Container(
+                          width: 60,
+                          height: 10,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 
@@ -306,9 +547,6 @@ class _SubTaskListScreenState extends State<SubTaskListScreen> {
           // Statistics Card
           _buildStatisticsCard(),
           const SizedBox(height: 16),
-
-          // Role information
-          _buildRoleInfoCard(authProvider, isAssignedUser),
 
           // Task Info Card
           Card(
@@ -373,62 +611,8 @@ class _SubTaskListScreenState extends State<SubTaskListScreen> {
     );
   }
 
-  Widget _buildRoleInfoCard(AuthProvider authProvider, bool isAssignedUser) {
-    String message = '';
-    Color color = Colors.blue;
-
-    if (authProvider.isAdmin) {
-      message = 'You can edit/delete all progress items';
-      color = Colors.green;
-    } else if (authProvider.isManager) {
-      message = 'You can only update progress status';
-      color = Colors.orange;
-    } else if (authProvider.isStaff) {
-      if (isAssignedUser) {
-        message = 'You can edit/delete progress items (Assigned user)';
-        color = Colors.blue;
-      } else {
-        message = 'View only (Not assigned to this task)';
-        color = Colors.grey;
-      }
-    } else {
-      return const SizedBox.shrink();
-    }
-
-    return Container(
-      padding: const EdgeInsets.all(12),
-      margin: const EdgeInsets.only(bottom: 16),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color),
-      ),
-      child: Row(
-        children: [
-          Icon(
-            Icons.info_outline,
-            size: 18,
-            color: color,
-          ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Text(
-              message,
-              style: TextStyle(
-                fontSize: 13,
-                color: color,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   Widget _buildSubTaskCard(SubTask subTask, String dateKey, AuthProvider authProvider,
       bool canEdit, bool canDelete, bool canChangeStatus, bool isAssignedUser) {
-
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
       elevation: 2,
@@ -513,7 +697,6 @@ class _SubTaskListScreenState extends State<SubTaskListScreen> {
             const SizedBox(height: 4),
             Row(
               children: [
-                // Status with change option if allowed
                 if (canChangeStatus)
                   GestureDetector(
                     onTap: () {
@@ -718,6 +901,11 @@ class _SubTaskListScreenState extends State<SubTaskListScreen> {
     );
 
     if (result != null && isMounted) {
+      // Show loading shimmer
+      setState(() {
+        _isLoading = true;
+      });
+
       final taskProvider = Provider.of<TaskProvider>(context, listen: false);
 
       final success = await taskProvider.addSubTask(
@@ -732,20 +920,12 @@ class _SubTaskListScreenState extends State<SubTaskListScreen> {
       if (success) {
         _showSnackBar('Progress added successfully');
 
-        // **FORCE UPDATE LOCAL TASK**
-        await taskProvider.fetchTasks(forceRefresh: true);
-
-        // Get updated task from provider
-        final updatedTask = taskProvider.getTaskById(_currentTask.id);
-
-        if (updatedTask != null && isMounted) {
-          setState(() {
-            _currentTask = updatedTask;
-            _groupedSubTasks = _groupSubTasksByDate();
-          });
-        }
-
+        // Force refresh with shimmer
+        await _refreshWithShimmer();
       } else {
+        setState(() {
+          _isLoading = false;
+        });
         _showSnackBar('Failed to add progress: ${taskProvider.error}', isError: true);
       }
     }
@@ -770,6 +950,11 @@ class _SubTaskListScreenState extends State<SubTaskListScreen> {
     );
 
     if (result != null && isMounted) {
+      // Show loading shimmer
+      setState(() {
+        _isLoading = true;
+      });
+
       final taskProvider = Provider.of<TaskProvider>(context, listen: false);
 
       final success = await taskProvider.updateSubTask(
@@ -783,9 +968,14 @@ class _SubTaskListScreenState extends State<SubTaskListScreen> {
       );
 
       if (success) {
-        await _refreshTaskData();
         _showSnackBar('Progress updated successfully');
+
+        // Force refresh with shimmer
+        await _refreshWithShimmer();
       } else {
+        setState(() {
+          _isLoading = false;
+        });
         _showSnackBar('Failed to update progress: ${taskProvider.error}', isError: true);
       }
     }
@@ -833,6 +1023,11 @@ class _SubTaskListScreenState extends State<SubTaskListScreen> {
     );
 
     if (selectedStatus != null && isMounted) {
+      // Show loading shimmer
+      setState(() {
+        _isLoading = true;
+      });
+
       final taskProvider = Provider.of<TaskProvider>(context, listen: false);
 
       final success = await taskProvider.updateSubTask(
@@ -846,9 +1041,14 @@ class _SubTaskListScreenState extends State<SubTaskListScreen> {
       );
 
       if (success) {
-        await _refreshTaskData();
         _showSnackBar('Status updated to ${selectedStatus!.toUpperCase()}');
+
+        // Force refresh with shimmer
+        await _refreshWithShimmer();
       } else {
+        setState(() {
+          _isLoading = false;
+        });
         _showSnackBar('Failed to update status: ${taskProvider.error}', isError: true);
       }
     }
@@ -929,6 +1129,11 @@ class _SubTaskListScreenState extends State<SubTaskListScreen> {
     );
 
     if (confirmed == true && isMounted) {
+      // Show loading shimmer
+      setState(() {
+        _isLoading = true;
+      });
+
       final taskProvider = Provider.of<TaskProvider>(context, listen: false);
 
       final success = await taskProvider.deleteSubTask(
@@ -937,15 +1142,19 @@ class _SubTaskListScreenState extends State<SubTaskListScreen> {
       );
 
       if (success) {
-        await _refreshTaskData();
         _showSnackBar('Progress deleted successfully');
+
+        // Force refresh with shimmer
+        await _refreshWithShimmer();
       } else {
+        setState(() {
+          _isLoading = false;
+        });
         _showSnackBar('Failed to delete progress: ${taskProvider.error}', isError: true);
       }
     }
   }
 
-  // Statistics Card
   Widget _buildStatisticsCard() {
     final allSubTasks = _allSubTasks;
     final completed = allSubTasks.where((st) => st.status == 'completed').length;

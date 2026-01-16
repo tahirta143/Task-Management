@@ -44,7 +44,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   final List<Widget> _staffPages = [
     const StaffDashboard(),
     const TaskListScreen(), // Tasks page
-    const ReportScreen(), // Reports page
+    // const ReportScreen(), // Reports page
   ];
 
   @override

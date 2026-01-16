@@ -441,25 +441,28 @@ class _CompanyListScreenState extends State<CompanyListScreen> {
                             color: Colors.grey.shade100,
                             borderRadius: BorderRadius.circular(isSmallPhone ? 10 : 12),
                           ),
-                          child: TextField(
-                            decoration: InputDecoration(
-                              hintText: 'Search companies...',
-                              hintStyle: TextStyle(
-                                fontSize: isSmallPhone ? 13 : 14,
+                          child: Padding(
+                            padding: const EdgeInsets.all(4.0),
+                            child: TextField(
+                              decoration: InputDecoration(
+                                hintText: 'Search companies...',
+                                hintStyle: TextStyle(
+                                  fontSize: isSmallPhone ? 13 : 14,
+                                ),
+                                prefixIcon: Icon(
+                                  Icons.search,
+                                  color: Colors.grey,
+                                  size: isSmallPhone ? 18 : 20,
+                                ),
+                                border: InputBorder.none,
+                                contentPadding: EdgeInsets.symmetric(
+                                  horizontal: isSmallPhone ? 12 : 16,
+                                ),
                               ),
-                              prefixIcon: Icon(
-                                Icons.search,
-                                color: Colors.grey,
-                                size: isSmallPhone ? 18 : 20,
-                              ),
-                              border: InputBorder.none,
-                              contentPadding: EdgeInsets.symmetric(
-                                horizontal: isSmallPhone ? 12 : 16,
-                              ),
+                              onChanged: (value) {
+                                // Implement search
+                              },
                             ),
-                            onChanged: (value) {
-                              // Implement search
-                            },
                           ),
                         ),
                       ),

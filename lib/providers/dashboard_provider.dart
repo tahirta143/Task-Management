@@ -7,19 +7,24 @@ import '../models/dashboard_model.dart';
 class DashboardProvider with ChangeNotifier {
   DashboardStats? _dashboardStats;
   bool _isLoading = false;
+  bool _isInitialLoading = false;
   String? _error;
 
   DashboardStats? get dashboardStats => _dashboardStats;
   bool get isLoading => _isLoading;
   String? get error => _error;
 
+  // NEW: Getter to check if we should show shimmer
+  bool get shouldShowShimmer => _isInitialLoading && _dashboardStats == null;
+
+
   Future<void> fetchDashboardData(String token) async {
     // Only set loading state and notify if we're not already loading
-    if (!_isLoading) {
-      _isLoading = true;
-      _error = null;
-      notifyListeners();
-    }
+    if (_dashboardStats == null) {
+      _isInitialLoading = true;
+    }  _isLoading = true;
+    _error = null;
+    notifyListeners();
 
     try {
       final response = await http.get(
@@ -39,7 +44,7 @@ class DashboardProvider with ChangeNotifier {
         final data = jsonDecode(response.body);
         _dashboardStats = DashboardStats.fromJson(data['data']);
         _error = null;
-
+        _isInitialLoading = false;
         // Print the parsed dashboard stats
         print('\n=== Dashboard Stats Data ===');
         print('TASKS:');
@@ -76,10 +81,12 @@ class DashboardProvider with ChangeNotifier {
       } else {
         _error = 'Failed to load dashboard data: ${response.statusCode}';
         print('Error: $_error');
+        _isInitialLoading = false;
       }
     } catch (e) {
       _error = 'Error: ${e.toString()}';
       print('Exception: $_error');
+      _isInitialLoading = false;
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -90,7 +97,13 @@ class DashboardProvider with ChangeNotifier {
   Future<void> refreshData(String token) async {
     await fetchDashboardData(token);
   }
-
+  void clearData() {
+    _dashboardStats = null;
+    _isLoading = false;
+    _isInitialLoading = false;
+    _error = null;
+    notifyListeners();
+  }
   // Helper method to print stats
   void printDashboardStats() {
     if (_dashboardStats != null) {

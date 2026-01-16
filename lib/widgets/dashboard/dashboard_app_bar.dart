@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:taskflow_app/screens/profile/profile_screen.dart';
+import '../../providers/password_provider.dart';
 import '../../theme/app_theme.dart';
 
 // Custom badge widget
@@ -106,13 +109,21 @@ class DashboardAppBar extends StatelessWidget implements PreferredSizeWidget {
         ),
         Padding(
           padding: const EdgeInsets.only(right: 16.0),
-          child: CircleAvatar(
-            backgroundColor: Colors.blue.shade100,
-            child: Text(
-              userName.isNotEmpty ? userName.substring(0, 1).toUpperCase() : 'U',
-              style: const TextStyle(
-                color: Colors.blue,
-                fontWeight: FontWeight.w600,
+          child: InkWell(
+            onTap: (){Navigator.push(context,  MaterialPageRoute(
+              builder: (context) => ChangeNotifierProvider(
+                create: (_) => PasswordProvider(),
+                child: const ProfileScreen(),
+              ),
+            ),);},
+            child: CircleAvatar(
+              backgroundColor: Colors.blue.shade100,
+              child: Text(
+                userName.isNotEmpty ? userName.substring(0, 1).toUpperCase() : 'U',
+                style: const TextStyle(
+                  color: Colors.blue,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
           ),

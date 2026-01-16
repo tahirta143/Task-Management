@@ -261,35 +261,35 @@ class _LoginScreenState extends State<LoginScreen> {
                       const SizedBox(height: 24),
 
                       // Role Demo Info
-                      Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: Colors.blue.shade50,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text(
-                              'Demo Credentials:',
-                              style: TextStyle(
-                                fontWeight: FontWeight.w600,
-                                color: Colors.blue,
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              '• Admin: admin@example.com / admin123\n'
-                                  '• Manager: manager@example.com / manager123\n'
-                                  '• Staff: staff@example.com / staff123',
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: Colors.grey.shade700,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
+                      // Container(
+                      //   padding: const EdgeInsets.all(16),
+                      //   decoration: BoxDecoration(
+                      //     color: Colors.blue.shade50,
+                      //     borderRadius: BorderRadius.circular(12),
+                      //   ),
+                      //   child: Column(
+                      //     crossAxisAlignment: CrossAxisAlignment.start,
+                      //     children: [
+                      //       const Text(
+                      //         'Demo Credentials:',
+                      //         style: TextStyle(
+                      //           fontWeight: FontWeight.w600,
+                      //           color: Colors.blue,
+                      //         ),
+                      //       ),
+                      //       const SizedBox(height: 8),
+                      //       Text(
+                      //         '• Admin: admin@example.com / admin123\n'
+                      //             '• Manager: manager@example.com / manager123\n'
+                      //             '• Staff: staff@example.com / staff123',
+                      //         style: TextStyle(
+                      //           fontSize: 12,
+                      //           color: Colors.grey.shade700,
+                      //         ),
+                      //       ),
+                      //     ],
+                      //   ),
+                      // ),
                     ],
                   ),
                 ),
@@ -297,14 +297,14 @@ class _LoginScreenState extends State<LoginScreen> {
 
               const SizedBox(height: 40),
 
-              // Footer
-              Text(
-                '© 2024 Task Manager Pro. All rights reserved.',
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Colors.grey.shade500,
-                ),
-              ),
+              // // Footer
+              // Text(
+              //   '© 2024 Task Manager Pro. All rights reserved.',
+              //   style: TextStyle(
+              //     fontSize: 12,
+              //     color: Colors.grey.shade500,
+              //   ),
+              // ),
             ],
           ),
         ),

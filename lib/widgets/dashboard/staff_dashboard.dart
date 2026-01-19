@@ -22,26 +22,48 @@ class StaffDashboard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Welcome Header
-            const Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'My Tasks 📋',
-                  style: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.w700,
-                    color: Colors.black,
-                  ),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    const Color(0xFF8B5CF6), // Appbar purple shade
+                    const Color(0xFF7E57C2), // Main appbar color
+                  ],
                 ),
-                SizedBox(height: 8),
-                Text(
-                  'Track your assigned tasks and progress.',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.grey,
+                borderRadius: BorderRadius.circular(24),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFF7E57C2).withOpacity(0.4),
+                    blurRadius: 25,
+                    spreadRadius: 5,
+                    offset: const Offset(0, 12),
                   ),
-                ),
-              ],
+                ],
+              ),
+              child: const Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'My Tasks 📋',
+                    style: TextStyle(
+                      fontSize: 28,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.white,
+                    ),
+                  ),
+                  SizedBox(height: 8),
+                  Text(
+                    'Track your assigned tasks and progress.',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.white,
+                    ),
+                  ),
+                ],
+              ),
             ),
 
             const SizedBox(height: 24),

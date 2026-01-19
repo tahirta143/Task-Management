@@ -91,16 +91,16 @@ class _DashboardBottomNavState extends State<DashboardBottomNav> {
                         AnimatedContainer(
                           duration: const Duration(milliseconds: 300),
                           curve: Curves.easeInOut,
-                          padding: const EdgeInsets.all(12),
+                          padding: const EdgeInsets.all(10),
                           decoration: BoxDecoration(
                             color: isSelected
-                                ? Colors.white
+                                ? const Color(0xFF7E57C2) // Appbar purple
                                 : Colors.transparent,
                             shape: BoxShape.circle,
                             boxShadow: isSelected
                                 ? [
                               BoxShadow(
-                                color: Colors.blue.withOpacity(0.3),
+                                color: const Color(0xFF7E57C2).withOpacity(0.3),
                                 blurRadius: 15,
                                 spreadRadius: 3,
                                 offset: const Offset(0, 5),
@@ -112,7 +112,7 @@ class _DashboardBottomNavState extends State<DashboardBottomNav> {
                             item['icon'] as IconData,
                             size: 24,
                             color: isSelected
-                                ? Colors.blue.shade700
+                                ? Colors.white // White on purple
                                 : Colors.grey.shade500,
                           ),
                         ),
@@ -134,7 +134,7 @@ class _DashboardBottomNavState extends State<DashboardBottomNav> {
                                   ? FontWeight.w700
                                   : FontWeight.w500,
                               color: isSelected
-                                  ? Colors.blue.shade700
+                                  ? const Color(0xFF7E57C2) // Appbar purple
                                   : Colors.grey.shade600,
                               letterSpacing: 0.3,
                             ),
@@ -162,12 +162,12 @@ class _CurvedNavigationPainter extends CustomPainter {
       ..style = PaintingStyle.fill;
 
     final path = Path()
-      ..moveTo(0, size.height * 0.4)
+      ..moveTo(0, size.height * 0.5)
       ..quadraticBezierTo(
         size.width * 0.5,
         0,
         size.width,
-        size.height * 0.4,
+        size.height * 0.5,
       )
       ..lineTo(size.width, size.height)
       ..lineTo(0, size.height)

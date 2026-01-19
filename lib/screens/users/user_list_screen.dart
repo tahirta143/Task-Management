@@ -75,7 +75,7 @@ class _UsersScreenState extends State<UsersScreen> {
                   style: TextStyle(fontWeight: FontWeight.w500),
                 ),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue[600],
+                  backgroundColor: Colors.deepPurple.shade400,
                   foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(
                     horizontal: 16,
@@ -91,24 +91,31 @@ class _UsersScreenState extends State<UsersScreen> {
         ],
         elevation: 1,
       ),
-      body: RefreshIndicator(
-        onRefresh: _onRefresh,
-        child: Column(
-          children: [
-            // Search and Filter Bar
-            _buildSearchFilterBar(userProvider),
+      body: SafeArea(
+        bottom: false,
+        child: Padding(
+          padding: EdgeInsets.only(
+            bottom: 50, // Height of the bottom nav bar
+          ),
+        child: RefreshIndicator(
+          onRefresh: _onRefresh,
+          child: Column(
+            children: [
+              // Search and Filter Bar
+              _buildSearchFilterBar(userProvider),
 
-            // Statistics Cards
-          //  _buildStatisticsCards(userProvider),
+              // Statistics Cards
+            //  _buildStatisticsCards(userProvider),
 
-            // User List
-            Expanded(
-              child: _buildUserList(userProvider),
-            ),
-          ],
+              // User List
+              Expanded(
+                child: _buildUserList(userProvider),
+              ),
+            ],
+          ),
         ),
       ),
-    );
+    ));
   }
 
   Widget _buildSearchFilterBar(UserProvider userProvider) {

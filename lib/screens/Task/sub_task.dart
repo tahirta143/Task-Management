@@ -210,6 +210,8 @@ class _SubTaskListScreenState extends State<SubTaskListScreen> {
 
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.deepPurple.shade400,
+        foregroundColor: Colors.white,
         title: Text(
           'Progress: ${_currentTask.title}',
           style: const TextStyle(fontSize: 18),

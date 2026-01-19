@@ -12,6 +12,9 @@ class CompanyCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final Color primaryColor = const Color(0xFF8B5CF6);
+    final Color secondaryColor = const Color(0xFF7E57C2);
+
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
 
@@ -35,12 +38,16 @@ class CompanyCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            blurRadius: 10,
+            color: primaryColor.withOpacity(0.1),
+            blurRadius: 15,
             spreadRadius: 2,
-            offset: const Offset(0, 2),
+            offset: const Offset(0, 4),
           ),
         ],
+        border: Border.all(
+          color: Colors.grey.shade100,
+          width: 1,
+        ),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -50,7 +57,14 @@ class CompanyCard extends StatelessWidget {
           Container(
             padding: EdgeInsets.all(cardPadding),
             decoration: BoxDecoration(
-              color: company.isActive ? Colors.blue.shade50 : Colors.grey.shade100,
+              gradient: LinearGradient(
+                colors: [
+                  company.isActive ? primaryColor.withOpacity(0.1) : Colors.grey.shade100,
+                  company.isActive ? primaryColor.withOpacity(0.05) : Colors.grey.shade50,
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
               borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(16),
                 topRight: Radius.circular(16),
@@ -63,8 +77,23 @@ class CompanyCard extends StatelessWidget {
                   width: isSmallPhone ? 40 : 50,
                   height: isSmallPhone ? 40 : 50,
                   decoration: BoxDecoration(
-                    color: company.isActive ? Colors.blue : Colors.grey,
+                    gradient: LinearGradient(
+                      colors: company.isActive
+                          ? [primaryColor, secondaryColor]
+                          : [Colors.grey.shade500, Colors.grey.shade700],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
                     borderRadius: BorderRadius.circular(isSmallPhone ? 10 : 12),
+                    boxShadow: [
+                      BoxShadow(
+                        color: company.isActive
+                            ? primaryColor.withOpacity(0.3)
+                            : Colors.grey.withOpacity(0.3),
+                        blurRadius: 8,
+                        offset: const Offset(0, 3),
+                      ),
+                    ],
                   ),
                   child: Icon(
                     Icons.business,
@@ -106,12 +135,12 @@ class CompanyCard extends StatelessWidget {
                 ),
 
                 // Menu Button
-                _buildPopupMenuButton(context, isSmallPhone),
+                _buildPopupMenuButton(context, isSmallPhone, primaryColor),
               ],
             ),
           ),
 
-          // Content Section (Scrollable if needed)
+          // Content Section
           Expanded(
             child: SingleChildScrollView(
               physics: const NeverScrollableScrollPhysics(),
@@ -121,83 +150,114 @@ class CompanyCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    // Contact Details
+                    // Contact Details with colored icons
                     _buildDetailRow(
                       context,
-                      Icons.location_on,
+                      Icons.location_on_outlined,
                       company.address,
                       isSmallPhone,
+                      primaryColor,
                     ),
                     SizedBox(height: detailSpacing),
 
                     _buildDetailRow(
                       context,
-                      Icons.phone,
+                      Icons.phone_outlined,
                       company.phone,
                       isSmallPhone,
+                      primaryColor,
                     ),
                     SizedBox(height: detailSpacing),
 
                     _buildDetailRow(
                       context,
-                      Icons.email,
+                      Icons.email_outlined,
                       company.email,
                       isSmallPhone,
+                      primaryColor,
                     ),
 
                     SizedBox(height: isSmallPhone ? 12 : 16),
-                    const Divider(height: 1),
+                    Divider(
+                      height: 1,
+                      color: Colors.grey.shade200,
+                    ),
                     SizedBox(height: isSmallPhone ? 12 : 16),
 
                     // Stats Row
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        // Team Members
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'TEAM',
-                              style: TextStyle(
-                                fontSize: smallFontSize,
-                                color: Colors.grey.shade600,
-                                fontWeight: FontWeight.w600,
-                              ),
+                        // Team Members with purple accent
+                        Container(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: isSmallPhone ? 12 : 16,
+                            vertical: isSmallPhone ? 6 : 8,
+                          ),
+                          decoration: BoxDecoration(
+                            color: primaryColor.withOpacity(0.08),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: primaryColor.withOpacity(0.2),
+                              width: 1,
                             ),
-                            SizedBox(height: isSmallPhone ? 2 : 4),
-                            Text(
-                              '${company.totalUser}',
-                              style: TextStyle(
-                                fontSize: isSmallPhone ? 16 : 18,
-                                fontWeight: FontWeight.w700,
-                                color: Colors.blue,
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Text(
+                                'TEAM',
+                                style: TextStyle(
+                                  fontSize: smallFontSize,
+                                  color: primaryColor,
+                                  fontWeight: FontWeight.w600,
+                                ),
                               ),
-                            ),
-                          ],
+                              SizedBox(height: isSmallPhone ? 2 : 4),
+                              Text(
+                                '${company.totalUser}',
+                                style: TextStyle(
+                                  fontSize: isSmallPhone ? 18 : 22,
+                                  fontWeight: FontWeight.w800,
+                                  color: primaryColor,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
 
-                        // Created Date
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            Text(
-                              'CREATED',
-                              style: TextStyle(
-                                fontSize: smallFontSize,
-                                color: Colors.grey.shade600,
-                                fontWeight: FontWeight.w600,
+                        // Created Date with subtle styling
+                        Container(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: isSmallPhone ? 12 : 16,
+                            vertical: isSmallPhone ? 6 : 8,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.grey.shade50,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Text(
+                                'CREATED',
+                                style: TextStyle(
+                                  fontSize: smallFontSize,
+                                  color: Colors.grey.shade600,
+                                  fontWeight: FontWeight.w600,
+                                ),
                               ),
-                            ),
-                            SizedBox(height: isSmallPhone ? 2 : 4),
-                            Text(
-                              DateFormat('MMM dd').format(company.createdAt),
-                              style: TextStyle(
-                                fontSize: bodyFontSize,
-                                fontWeight: FontWeight.w600,
+                              SizedBox(height: isSmallPhone ? 2 : 4),
+                              Text(
+                                DateFormat('MMM dd, yyyy').format(company.createdAt),
+                                style: TextStyle(
+                                  fontSize: bodyFontSize,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.grey.shade800,
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ],
                     ),
@@ -219,18 +279,35 @@ class CompanyCard extends StatelessWidget {
                 bottomLeft: Radius.circular(16),
                 bottomRight: Radius.circular(16),
               ),
+              border: Border(
+                top: BorderSide(
+                  color: Colors.grey.shade200,
+                  width: 1,
+                ),
+              ),
             ),
             child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                // Status Badge
+                // Status Badge with gradient
                 Container(
                   padding: EdgeInsets.symmetric(
-                    horizontal: isSmallPhone ? 10 : 12,
-                    vertical: isSmallPhone ? 3 : 4,
+                    horizontal: isSmallPhone ? 12 : 16,
+                    vertical: isSmallPhone ? 4 : 6,
                   ),
                   decoration: BoxDecoration(
-                    color: company.isActive ? Colors.green.shade50 : Colors.grey.shade200,
+                    gradient: LinearGradient(
+                      colors: company.isActive
+                          ? [Colors.green.shade100, Colors.green.shade50]
+                          : [Colors.grey.shade200, Colors.grey.shade100],
+                    ),
                     borderRadius: BorderRadius.circular(20),
+                    border: Border.all(
+                      color: company.isActive
+                          ? Colors.green.withOpacity(0.3)
+                          : Colors.grey.withOpacity(0.3),
+                      width: 1,
+                    ),
                   ),
                   child: Row(
                     children: [
@@ -240,43 +317,52 @@ class CompanyCard extends StatelessWidget {
                         decoration: BoxDecoration(
                           color: company.isActive ? Colors.green : Colors.grey,
                           shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: company.isActive
+                                  ? Colors.green.withOpacity(0.5)
+                                  : Colors.grey.withOpacity(0.5),
+                              blurRadius: 3,
+                              spreadRadius: 1,
+                            ),
+                          ],
                         ),
                       ),
-                      SizedBox(width: isSmallPhone ? 4 : 6),
+                      SizedBox(width: isSmallPhone ? 6 : 8),
                       Text(
                         company.isActive ? 'ACTIVE' : 'INACTIVE',
                         style: TextStyle(
                           fontSize: isSmallPhone ? 10 : 11,
                           fontWeight: FontWeight.w600,
-                          color: company.isActive ? Colors.green : Colors.grey,
+                          color: company.isActive ? Colors.green.shade700 : Colors.grey.shade700,
                         ),
                       ),
                     ],
                   ),
                 ),
 
-                const Spacer(),
-
-                // View Details Button
-                TextButton(
-                  onPressed: () {
-                    // Navigate to company details
-                  },
-                  style: TextButton.styleFrom(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: isSmallPhone ? 12 : 16,
-                      vertical: isSmallPhone ? 4 : 6,
-                    ),
-                    minimumSize: Size.zero,
+                // Edit button for quick access
+                Container(
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: primaryColor.withOpacity(0.2),
+                        blurRadius: 6,
+                        offset: const Offset(0, 3),
+                      ),
+                    ],
                   ),
-                  child: Text(
-                    'VIEW',
-                    style: TextStyle(
-                      fontSize: isSmallPhone ? 12 : 14,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.blue,
-                    ),
-                  ),
+                  // child: IconButton(
+                  //   onPressed: () => _showEditDialog(context, company),
+                  //   icon: Icon(
+                  //     Icons.edit_outlined,
+                  //     size: isSmallPhone ? 16 : 18,
+                  //     color: primaryColor,
+                  //   ),
+                  //   padding: EdgeInsets.all(isSmallPhone ? 4 : 6),
+                  //   constraints: const BoxConstraints(),
+                  // ),
                 ),
               ],
             ),
@@ -286,22 +372,31 @@ class CompanyCard extends StatelessWidget {
     );
   }
 
-  Widget _buildDetailRow(BuildContext context, IconData icon, String text, bool isSmallPhone) {
+  Widget _buildDetailRow(BuildContext context, IconData icon, String text, bool isSmallPhone, Color color) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(
-          icon,
-          size: isSmallPhone ? 14 : 16,
-          color: Colors.grey.shade500,
+        Container(
+          width: isSmallPhone ? 24 : 28,
+          height: isSmallPhone ? 24 : 28,
+          decoration: BoxDecoration(
+            color: color.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Icon(
+            icon,
+            size: isSmallPhone ? 14 : 16,
+            color: color,
+          ),
         ),
-        SizedBox(width: isSmallPhone ? 6 : 8),
+        SizedBox(width: isSmallPhone ? 8 : 10),
         Expanded(
           child: Text(
             text,
             style: TextStyle(
               fontSize: isSmallPhone ? 12 : 13,
               color: Colors.grey.shade700,
+              fontWeight: FontWeight.w500,
             ),
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
@@ -311,61 +406,96 @@ class CompanyCard extends StatelessWidget {
     );
   }
 
-  Widget _buildPopupMenuButton(BuildContext context, bool isSmallPhone) {
-    return PopupMenuButton<String>(
-      icon: Icon(
-        Icons.more_vert,
-        color: Colors.grey,
-        size: isSmallPhone ? 18 : 20,
+  Widget _buildPopupMenuButton(BuildContext context, bool isSmallPhone, Color primaryColor) {
+    return Container(
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.2),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
-      onSelected: (value) async {
-        final provider = Provider.of<CompanyProvider>(context, listen: false);
+      child: PopupMenuButton<String>(
+        icon: Icon(
+          Icons.more_vert_rounded,
+          color: primaryColor,
+          size: isSmallPhone ? 20 : 22,
+        ),
+        padding: EdgeInsets.zero,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        onSelected: (value) async {
+          final provider = Provider.of<CompanyProvider>(context, listen: false);
 
-        if (value == 'edit') {
-          _showEditDialog(context, company);
-        } else if (value == 'toggle') {
-          await provider.toggleCompanyStatus(company.id, company.isActive);
-        } else if (value == 'delete') {
-          await _showDeleteConfirmation(context, company, provider);
-        }
-      },
-      itemBuilder: (context) => [
-        PopupMenuItem<String>(
-          value: 'edit',
-          child: Row(
-            children: [
-              Icon(Icons.edit, size: isSmallPhone ? 16 : 18),
-              SizedBox(width: 8),
-              const Text('Edit'),
-            ],
+          if (value == 'edit') {
+            _showEditDialog(context, company);
+          } else if (value == 'toggle') {
+            await provider.toggleCompanyStatus(company.id, company.isActive);
+          } else if (value == 'delete') {
+            await _showDeleteConfirmation(context, company, provider);
+          }
+        },
+        itemBuilder: (context) => [
+          PopupMenuItem<String>(
+            value: 'edit',
+            child: Row(
+              children: [
+                Icon(Icons.edit_outlined, size: isSmallPhone ? 18 : 20, color: primaryColor),
+                SizedBox(width: 10),
+                Text(
+                  'Edit',
+                  style: TextStyle(
+                    color: Colors.grey.shade800,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
           ),
-        ),
-        PopupMenuItem<String>(
-          value: 'toggle',
-          child: Row(
-            children: [
-              Icon(
-                company.isActive ? Icons.toggle_off : Icons.toggle_on,
-                size: isSmallPhone ? 16 : 18,
-                color: company.isActive ? Colors.grey : Colors.green,
-              ),
-              SizedBox(width: 8),
-              Text(company.isActive ? 'Deactivate' : 'Activate'),
-            ],
+          PopupMenuItem<String>(
+            value: 'toggle',
+            child: Row(
+              children: [
+                Icon(
+                  company.isActive ? Icons.toggle_off_outlined : Icons.toggle_on_outlined,
+                  size: isSmallPhone ? 18 : 20,
+                  color: company.isActive ? Colors.grey : Colors.green,
+                ),
+                SizedBox(width: 10),
+                Text(
+                  company.isActive ? 'Deactivate' : 'Activate',
+                  style: TextStyle(
+                    color: Colors.grey.shade800,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
           ),
-        ),
-        const PopupMenuDivider(),
-        PopupMenuItem<String>(
-          value: 'delete',
-          child: Row(
-            children: const [
-              Icon(Icons.delete, size: 18, color: Colors.red),
-              SizedBox(width: 8),
-              Text('Delete', style: TextStyle(color: Colors.red)),
-            ],
+          const PopupMenuDivider(height: 8),
+          PopupMenuItem<String>(
+            value: 'delete',
+            child: Row(
+              children: [
+                Icon(Icons.delete_outline, size: isSmallPhone ? 18 : 20, color: Colors.red),
+                SizedBox(width: 10),
+                Text(
+                  'Delete',
+                  style: TextStyle(
+                    color: Colors.red,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -383,26 +513,87 @@ class CompanyCard extends StatelessWidget {
       ) async {
     return showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Delete Company'),
-        content: Text('Are you sure you want to delete ${company.name}?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Container(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 60,
+                height: 60,
+                decoration: BoxDecoration(
+                  color: Colors.red.shade100,
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.delete_outline,
+                  size: 32,
+                  color: Colors.red,
+                ),
+              ),
+              const SizedBox(height: 20),
+              Text(
+                'Delete Company',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.grey.shade800,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                'Are you sure you want to delete "${company.name}"?',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.grey.shade600,
+                ),
+              ),
+              const SizedBox(height: 24),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () => Navigator.pop(context),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: Colors.grey.shade700,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        side: BorderSide(color: Colors.grey.shade300),
+                      ),
+                      child: const Text('Cancel'),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () async {
+                        Navigator.pop(context);
+                        await provider.deleteCompany(company.id);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        elevation: 0,
+                      ),
+                      child: const Text('Delete'),
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ),
-          ElevatedButton(
-            onPressed: () async {
-              Navigator.pop(context);
-              await provider.deleteCompany(company.id);
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
-              foregroundColor: Colors.white,
-            ),
-            child: const Text('Delete'),
-          ),
-        ],
+        ),
       ),
     );
   }

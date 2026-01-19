@@ -146,26 +146,30 @@
 //     }
 //   }
 // }
-
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:taskflow_app/screens/Task/TaskListScreen.dart';
-import 'package:shimmer/shimmer.dart'; // Add this import
+import 'package:shimmer/shimmer.dart';
 
 import '../../models/dashboard_model.dart';
 
 class RecentTasks extends StatelessWidget {
   final List<RecentTask> tasks;
-  final bool isLoading; // Add this parameter
+  final bool isLoading;
 
   const RecentTasks({
     super.key,
     required this.tasks,
-    this.isLoading = false, // Add this with default value
+    this.isLoading = false,
   });
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+    final bool isSmallScreen = screenWidth < 600;
+    final bool isMediumScreen = screenWidth >= 600 && screenWidth < 1024;
+
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -178,22 +182,25 @@ class RecentTasks extends StatelessWidget {
           ),
         ],
       ),
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(isSmallScreen ? 12 : 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildHeader(),
-          const SizedBox(height: 16),
+          _buildHeader(context),
+          SizedBox(height: isSmallScreen ? 12 : 16),
           if (isLoading)
-            _buildShimmerTasks()
+            _buildShimmerTasks(context)
           else
-            _buildTasksContent(context), // Pass context here
+            _buildTasksContent(context),
         ],
       ),
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final bool isSmallScreen = screenWidth < 600;
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -202,8 +209,8 @@ class RecentTasks extends StatelessWidget {
             baseColor: Colors.grey.shade300,
             highlightColor: Colors.grey.shade100,
             child: Container(
-              width: 120,
-              height: 24,
+              width: isSmallScreen ? 100 : 120,
+              height: isSmallScreen ? 20 : 24,
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(4),
@@ -211,10 +218,10 @@ class RecentTasks extends StatelessWidget {
             ),
           )
         else
-          const Text(
+          Text(
             'Recent Tasks',
             style: TextStyle(
-              fontSize: 18,
+              fontSize: isSmallScreen ? 16 : 18,
               fontWeight: FontWeight.w600,
               color: Colors.black,
             ),
@@ -225,8 +232,8 @@ class RecentTasks extends StatelessWidget {
             baseColor: Colors.grey.shade300,
             highlightColor: Colors.grey.shade100,
             child: Container(
-              width: 24,
-              height: 24,
+              width: isSmallScreen ? 20 : 24,
+              height: isSmallScreen ? 20 : 24,
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(12),
@@ -234,15 +241,22 @@ class RecentTasks extends StatelessWidget {
             ),
           )
         else
-          const Icon(Icons.assignment, color: Colors.blue),
+          Icon(
+            Icons.assignment,
+            color: Colors.deepPurple,
+            size: isSmallScreen ? 20 : 24,
+          ),
       ],
     );
   }
 
-  Widget _buildTasksContent(BuildContext context) { // Add context parameter
+  Widget _buildTasksContent(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final bool isSmallScreen = screenWidth < 600;
+
     return Column(
       children: [
-        ...tasks.take(3).map((task) => _buildTaskItem(task)),
+        ...tasks.take(3).map((task) => _buildTaskItem(task, context)),
         if (tasks.length > 3)
           SizedBox(
             width: double.infinity,
@@ -253,28 +267,39 @@ class RecentTasks extends StatelessWidget {
                   MaterialPageRoute(builder: (context) => TaskListScreen()),
                 );
               },
-              child: const Text('View All Tasks'),
+              child: Text(
+                'View All Tasks',
+                style: TextStyle(
+                  fontSize: isSmallScreen ? 13 : 14,
+                ),
+              ),
             ),
           ),
       ],
     );
   }
 
-  Widget _buildShimmerTasks() {
+  Widget _buildShimmerTasks(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final bool isSmallScreen = screenWidth < 600;
+
     return Column(
       children: [
-        for (int i = 0; i < 3; i++) _buildShimmerTaskItem(),
+        for (int i = 0; i < 3; i++) _buildShimmerTaskItem(context),
       ],
     );
   }
 
-  Widget _buildShimmerTaskItem() {
+  Widget _buildShimmerTaskItem(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final bool isSmallScreen = screenWidth < 600;
+
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(12),
+      margin: EdgeInsets.only(bottom: isSmallScreen ? 8 : 12),
+      padding: EdgeInsets.all(isSmallScreen ? 8 : 12),
       decoration: BoxDecoration(
         color: Colors.grey.shade50,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(isSmallScreen ? 10 : 12),
         border: Border.all(color: Colors.grey.shade200),
       ),
       child: Row(
@@ -284,14 +309,14 @@ class RecentTasks extends StatelessWidget {
             highlightColor: Colors.grey.shade100,
             child: Container(
               width: 4,
-              height: 40,
+              height: isSmallScreen ? 32 : 40,
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
           ),
-          const SizedBox(width: 12),
+          SizedBox(width: isSmallScreen ? 8 : 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -301,22 +326,22 @@ class RecentTasks extends StatelessWidget {
                   highlightColor: Colors.grey.shade100,
                   child: Container(
                     width: double.infinity,
-                    height: 16,
+                    height: isSmallScreen ? 14 : 16,
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(4),
                     ),
                   ),
                 ),
-                const SizedBox(height: 8),
+                SizedBox(height: isSmallScreen ? 6 : 8),
                 Row(
                   children: [
                     Shimmer.fromColors(
                       baseColor: Colors.grey.shade300,
                       highlightColor: Colors.grey.shade100,
                       child: Container(
-                        width: 80,
-                        height: 12,
+                        width: isSmallScreen ? 60 : 80,
+                        height: isSmallScreen ? 10 : 12,
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(4),
@@ -328,8 +353,8 @@ class RecentTasks extends StatelessWidget {
                       baseColor: Colors.grey.shade300,
                       highlightColor: Colors.grey.shade100,
                       child: Container(
-                        width: 60,
-                        height: 12,
+                        width: isSmallScreen ? 50 : 60,
+                        height: isSmallScreen ? 10 : 12,
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(4),
@@ -341,13 +366,13 @@ class RecentTasks extends StatelessWidget {
               ],
             ),
           ),
-          const SizedBox(width: 12),
+          SizedBox(width: isSmallScreen ? 8 : 12),
           Shimmer.fromColors(
             baseColor: Colors.grey.shade300,
             highlightColor: Colors.grey.shade100,
             child: Container(
-              width: 60,
-              height: 24,
+              width: isSmallScreen ? 50 : 60,
+              height: isSmallScreen ? 20 : 24,
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(12),
@@ -359,59 +384,65 @@ class RecentTasks extends StatelessWidget {
     );
   }
 
-  Widget _buildTaskItem(RecentTask task) {
+  Widget _buildTaskItem(RecentTask task, BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final bool isSmallScreen = screenWidth < 600;
+    final double iconSize = isSmallScreen ? 10 : 12;
+    final double fontSizeSmall = isSmallScreen ? 10 : 12;
+    final double fontSizeNormal = isSmallScreen ? 12 : 14;
+
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(12),
+      margin: EdgeInsets.only(bottom: isSmallScreen ? 8 : 12),
+      padding: EdgeInsets.all(isSmallScreen ? 8 : 12),
       decoration: BoxDecoration(
         color: Colors.grey.shade50,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(isSmallScreen ? 10 : 12),
         border: Border.all(color: Colors.grey.shade200),
       ),
       child: Row(
         children: [
           Container(
             width: 4,
-            height: 40,
+            height: isSmallScreen ? 32 : 40,
             decoration: BoxDecoration(
               color: _getStatusColor(task.status),
               borderRadius: BorderRadius.circular(2),
             ),
           ),
-          const SizedBox(width: 12),
+          SizedBox(width: isSmallScreen ? 8 : 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   task.title,
-                  style: const TextStyle(
-                    fontSize: 14,
+                  style: TextStyle(
+                    fontSize: fontSizeNormal,
                     fontWeight: FontWeight.w600,
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
-                const SizedBox(height: 4),
+                SizedBox(height: isSmallScreen ? 2 : 4),
                 Row(
                   children: [
-                    Icon(Icons.person, size: 12, color: Colors.grey.shade600),
-                    const SizedBox(width: 4),
+                    Icon(Icons.person, size: iconSize, color: Colors.grey.shade600),
+                    SizedBox(width: isSmallScreen ? 2 : 4),
                     Text(
                       task.assignedTo.name,
                       style: TextStyle(
-                        fontSize: 12,
+                        fontSize: fontSizeSmall,
                         color: Colors.grey.shade600,
                       ),
                     ),
-                    const SizedBox(width: 12),
+                    SizedBox(width: isSmallScreen ? 8 : 12),
                     Icon(Icons.calendar_today,
-                        size: 12, color: Colors.grey.shade600),
-                    const SizedBox(width: 4),
+                        size: iconSize, color: Colors.grey.shade600),
+                    SizedBox(width: isSmallScreen ? 2 : 4),
                     Text(
                       DateFormat('MMM dd').format(task.endDate),
                       style: TextStyle(
-                        fontSize: 12,
+                        fontSize: fontSizeSmall,
                         color: Colors.grey.shade600,
                       ),
                     ),
@@ -420,13 +451,23 @@ class RecentTasks extends StatelessWidget {
               ],
             ),
           ),
+          SizedBox(width: isSmallScreen ? 8 : 12),
           Chip(
             label: Text(
               task.status.toUpperCase(),
-              style: const TextStyle(fontSize: 10, color: Colors.white),
+              style: TextStyle(
+                fontSize: isSmallScreen ? 8 : 10,
+                color: Colors.white,
+              ),
             ),
             backgroundColor: _getStatusColor(task.status),
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+            padding: EdgeInsets.symmetric(
+              horizontal: isSmallScreen ? 6 : 8,
+              vertical: isSmallScreen ? 1 : 2,
+            ),
+            visualDensity: isSmallScreen
+                ? VisualDensity.compact
+                : VisualDensity.standard,
           ),
         ],
       ),

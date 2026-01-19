@@ -1114,7 +1114,6 @@ class AuthProvider with ChangeNotifier {
       return false;
     }
   }
-
   // Helper method for testing
   void setMockUser({String role = 'admin', String? companyName}) {
     _userId = 'mock-user-id';

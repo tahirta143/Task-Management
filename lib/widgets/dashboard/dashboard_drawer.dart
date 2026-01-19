@@ -52,18 +52,58 @@ class DashboardDrawer extends StatelessWidget {
       final shouldLogout = await showDialog<bool>(
         context: context,
         builder: (context) => AlertDialog(
-          title: const Text('Logout'),
-          content: const Text('Are you sure you want to logout?'),
+          backgroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          title: const Text(
+            'Logout',
+            style: TextStyle(
+              color: Color(0xFF4A1FB8), // Dark purple
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          content: const Text(
+            'Are you sure you want to logout?',
+            style: TextStyle(color: Color(0xFF64748B)),
+          ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context, false),
-              child: const Text('Cancel'),
+              child: Text(
+                'Cancel',
+                style: TextStyle(
+                  color: const Color(0xFF7E57C2).withOpacity(0.8), // Appbar purple
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
             ),
-            TextButton(
-              onPressed: () => Navigator.pop(context, true),
-              child: const Text(
-                'Logout',
-                style: TextStyle(color: Colors.red),
+            Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    const Color(0xFFFEE2E2), // Light red
+                    const Color(0xFFFECACA),
+                  ],
+                ),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: ElevatedButton(
+                onPressed: () => Navigator.pop(context, true),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.transparent,
+                  foregroundColor: const Color(0xFFDC2626), // Red
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                child: const Text(
+                  'Logout',
+                  style: TextStyle(
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
               ),
             ),
           ],
@@ -78,8 +118,25 @@ class DashboardDrawer extends StatelessWidget {
         showDialog(
           context: context,
           barrierDismissible: false,
-          builder: (context) => const Center(
-            child: CircularProgressIndicator(),
+          builder: (context) => Center(
+            child: Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFF7E57C2).withOpacity(0.1),
+                    blurRadius: 20,
+                    spreadRadius: 2,
+                  ),
+                ],
+              ),
+              child: const CircularProgressIndicator(
+                strokeWidth: 3,
+                valueColor: AlwaysStoppedAnimation(Color(0xFF7E57C2)), // Appbar purple
+              ),
+            ),
           ),
         );
 
@@ -95,43 +152,74 @@ class DashboardDrawer extends StatelessWidget {
     }
 
     return Drawer(
+      backgroundColor: const Color(0xFFFAF5FF), // Light purple background
       child: Column(
         children: [
           // Header Section
           Container(
-            height: 200,
-            width: 305,
+            height: 220,
+            width: double.infinity,
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
                 colors: [
-                  Colors.blue.shade800,
-                  Colors.blue.shade600,
+                  const Color(0xFF7E57C2), // Appbar purple
+                  const Color(0xFF8B5CF6), // Light purple
                 ],
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
-                  blurRadius: 10,
-                  spreadRadius: 2,
+                  color: const Color(0xFF7E57C2).withOpacity(0.3),
+                  blurRadius: 15,
+                  spreadRadius: 3,
+                  offset: const Offset(0, 5),
                 ),
               ],
             ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                CircleAvatar(
-                  radius: 40,
-                  backgroundColor: Colors.white,
-                  child: Text(
-                    authProvider.userName?.isNotEmpty == true
-                        ? authProvider.userName!.substring(0, 1).toUpperCase()
-                        : 'U',
-                    style: const TextStyle(
-                      fontSize: 32,
-                      color: Colors.blue,
-                      fontWeight: FontWeight.bold,
+                Container(
+                  width: 80,
+                  height: 80,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: LinearGradient(
+                      colors: [
+                        Colors.white,
+                        Colors.white.withOpacity(0.8),
+                      ],
+                    ),
+                    border: Border.all(
+                      color: Colors.white.withOpacity(0.3),
+                      width: 3,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.2),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: Center(
+                    child: Text(
+                      authProvider.userName?.isNotEmpty == true
+                          ? authProvider.userName!.substring(0, 1).toUpperCase()
+                          : 'U',
+                      style: const TextStyle(
+                        fontSize: 36,
+                        color: Color(0xFF7E57C2), // Appbar purple
+                        fontWeight: FontWeight.w800,
+                        shadows: [
+                          Shadow(
+                            color: Colors.black26,
+                            blurRadius: 4,
+                            offset: Offset(0, 2),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -139,27 +227,43 @@ class DashboardDrawer extends StatelessWidget {
                 Text(
                   authProvider.userName ?? 'User',
                   style: const TextStyle(
-                    fontSize: 20,
+                    fontSize: 22,
                     color: Colors.white,
-                    fontWeight: FontWeight.w600,
+                    fontWeight: FontWeight.w700,
+                    shadows: [
+                      Shadow(
+                        color: Colors.black26,
+                        blurRadius: 4,
+                        offset: Offset(0, 2),
+                      ),
+                    ],
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: 8),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(12),
+                    gradient: LinearGradient(
+                      colors: [
+                        Colors.white.withOpacity(0.25),
+                        Colors.white.withOpacity(0.15),
+                      ],
+                    ),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(
+                      color: Colors.white.withOpacity(0.3),
+                      width: 1.5,
+                    ),
                   ),
                   child: Text(
                     authProvider.role?.toUpperCase() ?? 'STAFF',
                     style: const TextStyle(
-                      fontSize: 12,
+                      fontSize: 13,
                       color: Colors.white,
-                      fontWeight: FontWeight.w500,
-                      letterSpacing: 1,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 0.8,
                     ),
                   ),
                 ),
@@ -199,21 +303,21 @@ class DashboardDrawer extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
             decoration: BoxDecoration(
-              color: Colors.grey.shade50,
+              color: const Color(0xFFF5F3FF), // Slightly darker purple
               border: Border(
-                top: BorderSide(color: Colors.grey.shade200),
+                top: BorderSide(color: const Color(0xFFEDE9FE), width: 1.5), // Light purple border
               ),
             ),
             child: Column(
               children: [
-                Divider(color: Colors.grey.shade300),
+                Divider(color: const Color(0xFFEDE9FE)),
                 const SizedBox(height: 8),
                 _buildMenuItem(
                   context,
-                  icon: Icons.logout,
+                  icon: Icons.logout_rounded,
                   label: 'Logout',
-                  iconColor: Colors.red,
-                  textColor: Colors.red,
+                  iconColor: const Color(0xFFDC2626), // Red
+                  textColor: const Color(0xFFDC2626), // Red
                   onTap: _logout,
                   showTrailing: false,
                 ),
@@ -234,35 +338,57 @@ class DashboardDrawer extends StatelessWidget {
         required VoidCallback onTap,
         bool showTrailing = true,
       }) {
-    return ListTile(
-      leading: Container(
-        padding: const EdgeInsets.all(8),
-        decoration: BoxDecoration(
-          color: iconColor?.withOpacity(0.1) ?? Colors.blue.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(8),
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: const Color(0xFFEDE9FE), // Light purple border
+          width: 1.5,
         ),
-        child: Icon(
-          icon,
-          color: iconColor ?? Colors.blue.shade700,
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF7E57C2).withOpacity(0.05),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: ListTile(
+        leading: Container(
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: const Color(0xFF7E57C2).withOpacity(0.1), // Purple with opacity
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Icon(
+            icon,
+            color: iconColor ?? const Color(0xFF7E57C2), // Appbar purple
+            size: 22,
+          ),
+        ),
+        title: Text(
+          label,
+          style: TextStyle(
+            fontSize: 15,
+            fontWeight: FontWeight.w600,
+            color: textColor ?? const Color(0xFF4A1FB8), // Dark purple
+          ),
+        ),
+        trailing: showTrailing
+            ? Icon(
+          Icons.chevron_right_rounded,
+          color: const Color(0xFF8B5CF6).withOpacity(0.6), // Light purple
           size: 22,
+        )
+            : null,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+        onTap: onTap,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
         ),
       ),
-      title: Text(
-        label,
-        style: TextStyle(
-          fontSize: 15,
-          fontWeight: FontWeight.w500,
-          color: textColor ?? Colors.grey.shade800,
-        ),
-      ),
-      trailing: showTrailing
-          ? Icon(
-        Icons.chevron_right,
-        color: Colors.grey.shade400,
-      )
-          : null,
-      contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
-      onTap: onTap,
     );
   }
 }

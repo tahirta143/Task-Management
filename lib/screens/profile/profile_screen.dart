@@ -170,8 +170,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
         title: const Text('My Profile'),
         centerTitle: true,
         elevation: 0,
-        backgroundColor: Colors.transparent,
-        foregroundColor: Colors.blue,
+        backgroundColor: const Color(0xFF7E57C2), // Appbar purple
+        foregroundColor: Colors.white,
       ),
       body: _isLoading
           ? _buildShimmerLoading()
@@ -201,13 +201,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
             // // Role Badge
             // _buildRoleBadge(userRole),
-            //
-            // const SizedBox(height: 20),
-            //
-            // // Logout Button
-            // _buildLogoutButton(),
-            //
-            // const SizedBox(height: 40),
+
+            const SizedBox(height: 20),
+
+            // Logout Button
+            _buildLogoutButton(),
+
+            const SizedBox(height: 40),
           ],
         ),
       ),
@@ -222,14 +222,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
           const SizedBox(height: 40),
           // Shimmer Profile Avatar
           Shimmer.fromColors(
-            baseColor: Colors.grey[300]!,
-            highlightColor: Colors.grey[100]!,
+            baseColor: const Color(0xFFEDE9FE), // Light purple
+            highlightColor: const Color(0xFFF5F3FF), // Lighter purple
             child: Column(
               children: [
                 Container(
                   width: 120,
                   height: 120,
-                  decoration: BoxDecoration(
+                  decoration: const BoxDecoration(
                     shape: BoxShape.circle,
                     color: Colors.white,
                   ),
@@ -253,16 +253,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Shimmer.fromColors(
-              baseColor: Colors.grey[300]!,
-              highlightColor: Colors.grey[100]!,
+              baseColor: const Color(0xFFEDE9FE),
+              highlightColor: const Color(0xFFF5F3FF),
               child: Container(
                 padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: const Color(0xFFEDE9FE)),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.grey.withOpacity(0.15),
+                      color: const Color(0xFF7E57C2).withOpacity(0.08),
                       blurRadius: 20,
                       spreadRadius: 2,
                       offset: const Offset(0, 8),
@@ -314,16 +315,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Shimmer.fromColors(
-              baseColor: Colors.grey[300]!,
-              highlightColor: Colors.grey[100]!,
+              baseColor: const Color(0xFFEDE9FE),
+              highlightColor: const Color(0xFFF5F3FF),
               child: Container(
                 padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: const Color(0xFFEDE9FE)),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.grey.withOpacity(0.15),
+                      color: const Color(0xFF7E57C2).withOpacity(0.08),
                       blurRadius: 20,
                       spreadRadius: 2,
                       offset: const Offset(0, 8),
@@ -456,16 +458,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Shimmer.fromColors(
-              baseColor: Colors.grey[300]!,
-              highlightColor: Colors.grey[100]!,
+              baseColor: const Color(0xFFEDE9FE),
+              highlightColor: const Color(0xFFF5F3FF),
               child: Container(
                 padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: const Color(0xFFEDE9FE)),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.grey.withOpacity(0.15),
+                      color: const Color(0xFF7E57C2).withOpacity(0.08),
                       blurRadius: 20,
                       spreadRadius: 2,
                       offset: const Offset(0, 8),
@@ -555,14 +558,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
           // Shimmer Role Badge
           Shimmer.fromColors(
-            baseColor: Colors.grey[300]!,
-            highlightColor: Colors.grey[100]!,
+            baseColor: const Color(0xFFEDE9FE),
+            highlightColor: const Color(0xFFF5F3FF),
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(30),
-                border: Border.all(color: Colors.grey.shade200, width: 1.5),
+                border: Border.all(color: const Color(0xFFEDE9FE), width: 1.5),
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
@@ -595,15 +598,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Shimmer.fromColors(
-              baseColor: Colors.grey[300]!,
-              highlightColor: Colors.grey[100]!,
+              baseColor: const Color(0xFFEDE9FE),
+              highlightColor: const Color(0xFFF5F3FF),
               child: Container(
                 width: double.infinity,
                 height: 55,
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.grey.shade200, width: 1),
+                  border: Border.all(color: const Color(0xFFEDE9FE), width: 1),
                 ),
               ),
             ),
@@ -615,7 +618,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  // Shimmer Info Row
+// Shimmer Info Row
   Widget _buildShimmerInfoRow() {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -657,7 +660,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  // Original Widgets (unchanged)
+// Original Widgets (updated with purple colors)
   Widget _buildProfileAvatar(String name) {
     String firstLetter = name.isNotEmpty ? name[0].toUpperCase() : 'U';
 
@@ -674,13 +677,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
                 colors: [
-                  Colors.blue.shade400,
-                  Colors.blue.shade700,
+                  const Color(0xFF8B5CF6), // Light purple
+                  const Color(0xFF7E57C2), // Appbar purple
                 ],
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.blue.withOpacity(0.3),
+                  color: const Color(0xFF7E57C2).withOpacity(0.3),
                   blurRadius: 15,
                   spreadRadius: 3,
                   offset: const Offset(0, 5),
@@ -704,7 +707,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             style: const TextStyle(
               fontSize: 28,
               fontWeight: FontWeight.bold,
-              color: Colors.blue,
+              color: Color(0xFF7E57C2), // Appbar purple
             ),
           ),
         ],
@@ -717,54 +720,61 @@ class _ProfileScreenState extends State<ProfileScreen> {
       margin: const EdgeInsets.symmetric(horizontal: 20),
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: Colors.white,
+        gradient: LinearGradient(
+          colors: [
+            Colors.white,
+            const Color(0xFFFAF5FF), // Light purple from dashboard
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.15),
+            color: const Color(0xFF7E57C2).withOpacity(0.08),
             blurRadius: 20,
             spreadRadius: 2,
             offset: const Offset(0, 8),
           ),
         ],
-        border: Border.all(color: Colors.grey.shade100, width: 1),
+        border: Border.all(color: const Color(0xFFEDE9FE), width: 1), // Dashboard border
       ),
       child: Column(
         children: [
           Row(
             children: [
-              Icon(Icons.person_outline, color: Colors.blue.shade600, size: 24),
+              Icon(Icons.person_outline, color: const Color(0xFF7E57C2), size: 24),
               const SizedBox(width: 12),
               const Text(
                 'Personal Information',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
-                  color: Colors.black87,
+                  color: Color(0xFF4A1FB8), // Dark purple
                 ),
               ),
             ],
           ),
           const SizedBox(height: 20),
-          const Divider(height: 1, color: Colors.grey),
+          const Divider(height: 1, color: Color(0xFFEDE9FE)),
           const SizedBox(height: 20),
           _buildInfoRow(
             icon: Icons.person,
-            iconColor: Colors.blue,
+            iconColor: const Color(0xFF7E57C2), // Appbar purple
             label: 'Full Name',
             value: name,
           ),
           const SizedBox(height: 24),
           _buildInfoRow(
             icon: Icons.email,
-            iconColor: Colors.red.shade400,
+            iconColor: const Color(0xFF8B5CF6), // Light purple
             label: 'Email Address',
             value: email,
           ),
           const SizedBox(height: 24),
           _buildInfoRow(
             icon: Icons.badge,
-            iconColor: Colors.purple.shade400,
+            iconColor: const Color(0xFFAB47BC), // Vibrant purple
             label: 'Role',
             value: role.capitalize(),
           ),
@@ -800,7 +810,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 label,
                 style: TextStyle(
                   fontSize: 14,
-                  color: Colors.grey.shade600,
+                  color: const Color(0xFF7E57C2).withOpacity(0.7), // Purple with opacity
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -810,7 +820,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 style: const TextStyle(
                   fontSize: 17,
                   fontWeight: FontWeight.w600,
-                  color: Colors.black87,
+                  color: Color(0xFF4A1FB8), // Dark purple
                 ),
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
@@ -831,15 +841,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            Colors.green.shade50,
-            Colors.teal.shade50,
+            const Color(0xFFF5F3FF), // Light purple
+            const Color(0xFFEDE9FE), // Dashboard card color
           ],
         ),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.green.shade200, width: 2),
+        border: Border.all(color: const Color(0xFFC4B5FD), width: 2), // Purple border
         boxShadow: [
           BoxShadow(
-            color: Colors.green.withOpacity(0.15),
+            color: const Color(0xFF7E57C2).withOpacity(0.15),
             blurRadius: 15,
             spreadRadius: 2,
             offset: const Offset(0, 5),
@@ -855,13 +865,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 width: 50,
                 height: 50,
                 decoration: BoxDecoration(
-                  color: Colors.green.shade100,
+                  color: const Color(0xFF7E57C2).withOpacity(0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(
                   Icons.business,
                   size: 28,
-                  color: Colors.green.shade700,
+                  color: const Color(0xFF7E57C2), // Appbar purple
                 ),
               ),
               const SizedBox(width: 16),
@@ -871,25 +881,25 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w600,
-                    color: Colors.green,
+                    color: Color(0xFF7E57C2), // Appbar purple
                   ),
                 ),
               ),
               Icon(
                 Icons.verified,
-                color: Colors.green.shade600,
+                color: const Color(0xFF7E57C2),
                 size: 24,
               ),
             ],
           ),
           const SizedBox(height: 20),
-          const Divider(height: 1, color: Colors.green),
+          const Divider(height: 1, color: Color(0xFFEDE9FE)),
           const SizedBox(height: 20),
           Row(
             children: [
               Icon(
                 Icons.apartment,
-                color: Colors.green.shade600,
+                color: const Color(0xFF7E57C2),
                 size: 22,
               ),
               const SizedBox(width: 12),
@@ -901,17 +911,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       'Company Name',
                       style: TextStyle(
                         fontSize: 14,
-                        color: Colors.grey.shade600,
+                        color: const Color(0xFF7E57C2).withOpacity(0.7),
                         fontWeight: FontWeight.w500,
                       ),
                     ),
                     const SizedBox(height: 6),
                     Text(
                       companyName,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w700,
-                        color: Colors.green.shade800,
+                        color: Color(0xFF5B21B6), // Dark purple
                       ),
                     ),
                   ],
@@ -924,7 +934,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             children: [
               Icon(
                 Icons.badge,
-                color: Colors.green.shade600,
+                color: const Color(0xFF7E57C2),
                 size: 22,
               ),
               const SizedBox(width: 12),
@@ -936,17 +946,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       'Position',
                       style: TextStyle(
                         fontSize: 14,
-                        color: Colors.grey.shade600,
+                        color: const Color(0xFF7E57C2).withOpacity(0.7),
                         fontWeight: FontWeight.w500,
                       ),
                     ),
                     const SizedBox(height: 6),
                     Text(
                       'Company Manager',
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
-                        color: Colors.green.shade700,
+                        color: Color(0xFF7E57C2), // Appbar purple
                       ),
                     ),
                   ],
@@ -968,15 +978,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            Colors.orange.shade50,
-            Colors.amber.shade50,
+            const Color(0xFFFAF5FF),
+            const Color(0xFFF3E8FF),
           ],
         ),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.orange.shade200, width: 2),
+        border: Border.all(color: const Color(0xFFD8B4FE), width: 2), // Purple border
         boxShadow: [
           BoxShadow(
-            color: Colors.orange.withOpacity(0.15),
+            color: const Color(0xFF7E57C2).withOpacity(0.15),
             blurRadius: 15,
             spreadRadius: 2,
             offset: const Offset(0, 5),
@@ -992,13 +1002,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 width: 50,
                 height: 50,
                 decoration: BoxDecoration(
-                  color: Colors.orange.shade100,
+                  color: const Color(0xFF7E57C2).withOpacity(0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(
                   Icons.lock_reset,
                   size: 28,
-                  color: Colors.orange.shade700,
+                  color: const Color(0xFF7E57C2), // Appbar purple
                 ),
               ),
               const SizedBox(width: 16),
@@ -1008,19 +1018,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w600,
-                    color: Colors.orange,
+                    color: Color(0xFF7E57C2), // Appbar purple
                   ),
                 ),
               ),
               Icon(
                 Icons.security,
-                color: Colors.orange.shade600,
+                color: const Color(0xFF7E57C2),
                 size: 24,
               ),
             ],
           ),
           const SizedBox(height: 20),
-          const Divider(height: 1, color: Colors.orange),
+          const Divider(height: 1, color: Color(0xFFEDE9FE)),
           const SizedBox(height: 20),
           Form(
             key: _formKey,
@@ -1075,19 +1085,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     width: double.infinity,
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: Colors.red.shade50,
+                      color: const Color(0xFFFEE2E2), // Light red
                       borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: Colors.red.shade200),
+                      border: Border.all(color: const Color(0xFFFCA5A5)),
                     ),
                     child: Row(
                       children: [
-                        Icon(Icons.error_outline, color: Colors.red.shade700, size: 20),
+                        Icon(Icons.error_outline, color: const Color(0xFFDC2626), size: 20),
                         const SizedBox(width: 10),
                         Expanded(
                           child: Text(
                             passwordProvider.error!,
-                            style: TextStyle(
-                              color: Colors.red.shade700,
+                            style: const TextStyle(
+                              color: Color(0xFFDC2626),
                               fontSize: 14,
                             ),
                           ),
@@ -1100,19 +1110,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     width: double.infinity,
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: Colors.green.shade50,
+                      color: const Color(0xFFDCFCE7), // Light green
                       borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: Colors.green.shade200),
+                      border: Border.all(color: const Color(0xFF86EFAC)),
                     ),
                     child: Row(
                       children: [
-                        Icon(Icons.check_circle, color: Colors.green.shade700, size: 20),
+                        Icon(Icons.check_circle, color: const Color(0xFF16A34A), size: 20),
                         const SizedBox(width: 10),
                         Expanded(
                           child: Text(
                             passwordProvider.successMessage!,
-                            style: TextStyle(
-                              color: Colors.green.shade700,
+                            style: const TextStyle(
+                              color: Color(0xFF16A34A),
                               fontSize: 14,
                             ),
                           ),
@@ -1121,19 +1131,35 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                   ),
                 const SizedBox(height: 20),
-                SizedBox(
-                  width: double.infinity,
-                  height: 55,
+                Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        const Color(0xFF7E57C2),
+                        const Color(0xFF6D28D9),
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFF7E57C2).withOpacity(0.3),
+                        blurRadius: 8,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
                   child: ElevatedButton(
                     onPressed: passwordProvider.isLoading ? null : _changePassword,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.orange.shade600,
+                      backgroundColor: Colors.transparent,
                       foregroundColor: Colors.white,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      elevation: 3,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      elevation: 0,
+                      minimumSize: const Size(double.infinity, 55),
                     ),
                     child: passwordProvider.isLoading
                         ? const SizedBox(
@@ -1175,29 +1201,26 @@ class _ProfileScreenState extends State<ProfileScreen> {
       onChanged: onChanged,
       decoration: InputDecoration(
         labelText: label,
-        prefixIcon: Icon(icon, color: Colors.orange.shade600),
-
-        // 👁️ SUFFIX EYE ICON
+        labelStyle: const TextStyle(color: Color(0xFF7E57C2)),
+        prefixIcon: Icon(icon, color: const Color(0xFF7E57C2)),
         suffixIcon: IconButton(
           icon: Icon(
             obscureText ? Icons.visibility_off : Icons.visibility,
-            color: Colors.orange.shade600,
+            color: const Color(0xFF7E57C2),
           ),
           onPressed: onToggle,
         ),
-
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: Colors.orange.shade300),
+          borderSide: const BorderSide(color: Color(0xFFD8B4FE)),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: Colors.orange.shade500, width: 2),
+          borderSide: const BorderSide(color: Color(0xFF7E57C2), width: 2),
         ),
         filled: true,
         fillColor: Colors.white,
-        contentPadding:
-        const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+        contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
       ),
       validator: (value) {
         if (value == null || value.isEmpty) {
@@ -1218,22 +1241,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     switch (role.toLowerCase()) {
       case 'admin':
-        badgeColor = Colors.purple;
+        badgeColor = const Color(0xFFAB47BC); // Vibrant purple
         displayRole = 'Administrator';
         badgeIcon = Icons.admin_panel_settings;
         break;
       case 'manager':
-        badgeColor = Colors.green;
+        badgeColor = const Color(0xFF7E57C2); // Appbar purple
         displayRole = 'Manager';
         badgeIcon = Icons.badge;
         break;
-      case 'staff':
-        badgeColor = Colors.orange;
-        displayRole = 'Staff Member';
+      case 'employee':
+        badgeColor = const Color(0xFF8B5CF6); // Light purple
+        displayRole = 'Employee';
         badgeIcon = Icons.people;
         break;
+      case 'staff':
+        badgeColor = const Color(0xFFA78BFA); // Lighter purple
+        displayRole = 'Staff Member';
+        badgeIcon = Icons.person;
+        break;
       default:
-        badgeColor = Colors.blue;
+        badgeColor = const Color(0xFF7E57C2);
         displayRole = role.capitalize();
         badgeIcon = Icons.person;
     }
@@ -1291,11 +1319,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
         child: ElevatedButton(
           onPressed: _handleLogout,
           style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.red.shade50,
-            foregroundColor: Colors.red,
+            backgroundColor: const Color(0xFFFEE2E2), // Light red
+            foregroundColor: const Color(0xFFDC2626), // Red
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
-              side: BorderSide(color: Colors.red.shade300, width: 1),
+              side: const BorderSide(color: Color(0xFFFCA5A5), width: 1),
             ),
             elevation: 0,
           ),

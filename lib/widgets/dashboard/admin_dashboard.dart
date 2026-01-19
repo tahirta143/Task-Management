@@ -657,7 +657,6 @@
 //     );
 //   }
 // }
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:taskflow_app/widgets/dashboard/recent_tasks.dart';
@@ -679,8 +678,8 @@ class AdminDashboard extends StatelessWidget {
     final showShimmer = dashboardProvider.shouldShowShimmer;
 
     return RefreshIndicator(
-      color: theme.primaryColor,
-      backgroundColor: theme.scaffoldBackgroundColor,
+      color: const Color(0xFF7E57C2), // Matching appbar purple
+      backgroundColor: const Color(0xFFF5F3FF), // Light purple background
       onRefresh: () async {
         if (authProvider.token != null) {
           await dashboardProvider.refreshData(authProvider.token!);
@@ -727,16 +726,17 @@ class AdminDashboard extends StatelessWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            theme.primaryColor.withOpacity(0.9),
-            theme.primaryColor,
+            const Color(0xFF8B5CF6), // Appbar purple shade
+            const Color(0xFF7E57C2), // Main appbar color
           ],
         ),
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: theme.primaryColor.withOpacity(0.3),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
+            color: const Color(0xFF7E57C2).withOpacity(0.4),
+            blurRadius: 25,
+            spreadRadius: 5,
+            offset: const Offset(0, 12),
           ),
         ],
       ),
@@ -746,7 +746,7 @@ class AdminDashboard extends StatelessWidget {
           if (isLoading)
             Shimmer.fromColors(
               baseColor: Colors.white.withOpacity(0.3),
-              highlightColor: Colors.white.withOpacity(0.5),
+              highlightColor: Colors.white.withOpacity(0.6),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -777,16 +777,25 @@ class AdminDashboard extends StatelessWidget {
                 Row(
                   children: [
                     Container(
-                      width: 50,
-                      height: 50,
+                      width: 56,
+                      height: 56,
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.2),
+                        gradient: LinearGradient(
+                          colors: [
+                            Colors.white.withOpacity(0.3),
+                            Colors.white.withOpacity(0.1),
+                          ],
+                        ),
                         shape: BoxShape.circle,
+                        border: Border.all(
+                          color: Colors.white.withOpacity(0.3),
+                          width: 2,
+                        ),
                       ),
                       child: const Icon(
-                        Icons.person_outline,
+                        Icons.person_rounded,
                         color: Colors.white,
-                        size: 28,
+                        size: 32,
                       ),
                     ),
                     const SizedBox(width: 16),
@@ -800,24 +809,32 @@ class AdminDashboard extends StatelessWidget {
                               fontSize: 16,
                               color: Colors.white.withOpacity(0.9),
                               fontWeight: FontWeight.w500,
+                              letterSpacing: 0.5,
                             ),
                           ),
                           Text(
                             userName,
                             style: const TextStyle(
-                              fontSize: 28,
+                              fontSize: 32,
                               color: Colors.white,
-                              fontWeight: FontWeight.w700,
+                              fontWeight: FontWeight.w800,
                               height: 1.2,
+                              shadows: [
+                                Shadow(
+                                  color: Colors.black26,
+                                  blurRadius: 6,
+                                  offset: Offset(0, 3),
+                                ),
+                              ],
                             ),
                           ),
                         ],
                       ),
                     ),
                     Icon(
-                      Icons.waving_hand,
-                      color: Colors.yellow[300],
-                      size: 32,
+                      Icons.waving_hand_rounded,
+                      color: const Color(0xFFFFD700),
+                      size: 36,
                     ),
                   ],
                 ),
@@ -826,7 +843,7 @@ class AdminDashboard extends StatelessWidget {
                   'Here\'s what\'s happening with your tasks today.',
                   style: TextStyle(
                     fontSize: 16,
-                    color: Colors.white.withOpacity(0.8),
+                    color: Colors.white.withOpacity(0.85),
                     fontWeight: FontWeight.w400,
                   ),
                 ),
@@ -848,31 +865,42 @@ class AdminDashboard extends StatelessWidget {
             Text(
               'Quick Stats',
               style: TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.w700,
-                color: theme.colorScheme.onBackground,
+                fontSize: 24,
+                fontWeight: FontWeight.w800,
+                color: const Color(0xFF4A1FB8), // Dark purple
+                letterSpacing: -0.5,
               ),
             ),
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
               decoration: BoxDecoration(
-                color: theme.primaryColor.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(20),
+                gradient: LinearGradient(
+                  colors: [
+                    const Color(0xFF7E57C2).withOpacity(0.15),
+                    const Color(0xFF7E57C2).withOpacity(0.08),
+                  ],
+                ),
+                borderRadius: BorderRadius.circular(24),
+                border: Border.all(
+                  color: const Color(0xFF7E57C2).withOpacity(0.2),
+                  width: 1.5,
+                ),
               ),
               child: Row(
                 children: [
                   Icon(
-                    Icons.timeline,
-                    color: theme.primaryColor,
-                    size: 16,
+                    Icons.timeline_rounded,
+                    color: const Color(0xFF7E57C2),
+                    size: 18,
                   ),
-                  const SizedBox(width: 6),
+                  const SizedBox(width: 8),
                   Text(
                     'Today',
                     style: TextStyle(
                       fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      color: theme.primaryColor,
+                      fontWeight: FontWeight.w700,
+                      color: const Color(0xFF7E57C2),
+                      letterSpacing: 0.3,
                     ),
                   ),
                 ],
@@ -912,20 +940,24 @@ class AdminDashboard extends StatelessWidget {
 
   Widget _buildStatCardSkeleton(ThemeData theme) {
     return Shimmer.fromColors(
-      baseColor: Colors.grey.shade300,
-      highlightColor: Colors.grey.shade100,
+      baseColor: const Color(0xFFEDE9FE), // Light purple
+      highlightColor: const Color(0xFFF5F3FF), // Lighter purple
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: Colors.grey.withOpacity(0.08),
-              blurRadius: 15,
+              color: const Color(0xFF7E57C2).withOpacity(0.08),
+              blurRadius: 20,
               spreadRadius: 2,
-              offset: const Offset(0, 4),
+              offset: const Offset(0, 6),
             ),
           ],
+          border: Border.all(
+            color: const Color(0xFFEDE9FE),
+            width: 1.5,
+          ),
         ),
         padding: const EdgeInsets.all(20),
         child: Column(
@@ -941,12 +973,6 @@ class AdminDashboard extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(14),
-                    boxShadow: [
-                      BoxShadow(
-                        color: theme.primaryColor.withOpacity(0.1),
-                        blurRadius: 10,
-                      ),
-                    ],
                   ),
                 ),
                 Container(
@@ -991,11 +1017,20 @@ class AdminDashboard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: Colors.white,
+        gradient: LinearGradient(
+          colors: [
+            const Color(0xFFFDF2F8),
+            const Color(0xFFFCE7F3),
+          ],
+        ),
         borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: const Color(0xFFFBCFE8),
+          width: 1.5,
+        ),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.08),
+            color: const Color(0xFFFBCFE8).withOpacity(0.3),
             blurRadius: 15,
             spreadRadius: 2,
             offset: const Offset(0, 4),
@@ -1008,12 +1043,21 @@ class AdminDashboard extends StatelessWidget {
             width: 80,
             height: 80,
             decoration: BoxDecoration(
-              color: Colors.red.withOpacity(0.1),
+              gradient: LinearGradient(
+                colors: [
+                  const Color(0xFFEC4899).withOpacity(0.1),
+                  const Color(0xFFDB2777).withOpacity(0.1),
+                ],
+              ),
               shape: BoxShape.circle,
+              border: Border.all(
+                color: const Color(0xFFF472B6),
+                width: 2,
+              ),
             ),
             child: Icon(
               Icons.error_outline_rounded,
-              color: Colors.red[600],
+              color: const Color(0xFFDB2777),
               size: 40,
             ),
           ),
@@ -1022,8 +1066,8 @@ class AdminDashboard extends StatelessWidget {
             'Unable to Load Statistics',
             style: TextStyle(
               fontSize: 18,
-              fontWeight: FontWeight.w600,
-              color: theme.colorScheme.onBackground,
+              fontWeight: FontWeight.w700,
+              color: const Color(0xFFBE185D),
             ),
           ),
           const SizedBox(height: 8),
@@ -1034,7 +1078,7 @@ class AdminDashboard extends StatelessWidget {
                 error,
                 style: TextStyle(
                   fontSize: 14,
-                  color: Colors.grey.shade600,
+                  color: const Color(0xFFBE185D).withOpacity(0.8),
                   height: 1.5,
                 ),
                 textAlign: TextAlign.center,
@@ -1049,11 +1093,20 @@ class AdminDashboard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: Colors.white,
+        gradient: LinearGradient(
+          colors: [
+            const Color(0xFFFAF5FF),
+            const Color(0xFFF3E8FF),
+          ],
+        ),
         borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: const Color(0xFFE9D5FF),
+          width: 1.5,
+        ),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.08),
+            color: const Color(0xFFE9D5FF).withOpacity(0.3),
             blurRadius: 15,
             spreadRadius: 2,
             offset: const Offset(0, 4),
@@ -1066,12 +1119,21 @@ class AdminDashboard extends StatelessWidget {
             width: 80,
             height: 80,
             decoration: BoxDecoration(
-              color: theme.primaryColor.withOpacity(0.1),
+              gradient: LinearGradient(
+                colors: [
+                  const Color(0xFF7E57C2).withOpacity(0.15),
+                  const Color(0xFF6D28D9).withOpacity(0.15),
+                ],
+              ),
               shape: BoxShape.circle,
+              border: Border.all(
+                color: const Color(0xFFC4B5FD),
+                width: 2,
+              ),
             ),
             child: Icon(
-              Icons.analytics_outlined,
-              color: theme.primaryColor,
+              Icons.analytics_rounded,
+              color: const Color(0xFF7E57C2),
               size: 40,
             ),
           ),
@@ -1080,8 +1142,8 @@ class AdminDashboard extends StatelessWidget {
             'No Statistics Available',
             style: TextStyle(
               fontSize: 18,
-              fontWeight: FontWeight.w600,
-              color: theme.colorScheme.onBackground,
+              fontWeight: FontWeight.w700,
+              color: const Color(0xFF5B21B6),
             ),
           ),
           const SizedBox(height: 8),
@@ -1089,7 +1151,7 @@ class AdminDashboard extends StatelessWidget {
             'Complete tasks to see your statistics',
             style: TextStyle(
               fontSize: 14,
-              color: Colors.grey.shade600,
+              color: const Color(0xFF5B21B6).withOpacity(0.8),
             ),
           ),
         ],
@@ -1101,14 +1163,23 @@ class AdminDashboard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: Colors.white,
+        gradient: LinearGradient(
+          colors: [
+            const Color(0xFFFFFFFF),
+            const Color(0xFFFAF5FF),
+          ],
+        ),
         borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: const Color(0xFFEDE9FE),
+          width: 1.5,
+        ),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.08),
-            blurRadius: 15,
+            color: const Color(0xFF7E57C2).withOpacity(0.1),
+            blurRadius: 25,
             spreadRadius: 2,
-            offset: const Offset(0, 4),
+            offset: const Offset(0, 8),
           ),
         ],
       ),
@@ -1121,29 +1192,50 @@ class AdminDashboard extends StatelessWidget {
               Text(
                 'Company Overview',
                 style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w700,
-                  color: theme.colorScheme.onBackground,
+                  fontSize: 22,
+                  fontWeight: FontWeight.w800,
+                  color: const Color(0xFF4A1FB8),
+                  letterSpacing: -0.5,
                 ),
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
-                      theme.primaryColor.withOpacity(0.9),
-                      theme.primaryColor,
+                      const Color(0xFF7E57C2),
+                      const Color(0xFF6D28D9),
                     ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
                   ),
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: BorderRadius.circular(24),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFF7E57C2).withOpacity(0.3),
+                      blurRadius: 8,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
                 ),
-                child: const Text(
-                  'Active',
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.white,
-                  ),
+                child: const Row(
+                  children: [
+                    Icon(
+                      Icons.check_circle_rounded,
+                      color: Colors.white,
+                      size: 14,
+                    ),
+                    SizedBox(width: 6),
+                    Text(
+                      'Active',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white,
+                        letterSpacing: 0.3,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
@@ -1160,14 +1252,23 @@ class AdminDashboard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: Colors.white,
+        gradient: LinearGradient(
+          colors: [
+            const Color(0xFFFFFFFF),
+            const Color(0xFFFAF5FF),
+          ],
+        ),
         borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: const Color(0xFFEDE9FE),
+          width: 1.5,
+        ),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.08),
-            blurRadius: 15,
+            color: const Color(0xFF7E57C2).withOpacity(0.1),
+            blurRadius: 25,
             spreadRadius: 2,
-            offset: const Offset(0, 4),
+            offset: const Offset(0, 8),
           ),
         ],
       ),
@@ -1180,18 +1281,40 @@ class AdminDashboard extends StatelessWidget {
               Text(
                 'Recent Tasks',
                 style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w700,
-                  color: theme.colorScheme.onBackground,
+                  fontSize: 22,
+                  fontWeight: FontWeight.w800,
+                  color: const Color(0xFF4A1FB8),
+                  letterSpacing: -0.5,
                 ),
               ),
               IconButton(
                 onPressed: () {
                   // Navigate to all tasks
                 },
-                icon: Icon(
-                  Icons.arrow_forward_rounded,
-                  color: theme.primaryColor,
+                icon: Container(
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        const Color(0xFF7E57C2),
+                        const Color(0xFF6D28D9),
+                      ],
+                    ),
+                    borderRadius: BorderRadius.circular(14),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFF7E57C2).withOpacity(0.3),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: const Icon(
+                    Icons.arrow_forward_rounded,
+                    color: Colors.white,
+                    size: 24,
+                  ),
                 ),
                 tooltip: 'View all tasks',
               ),
@@ -1202,7 +1325,8 @@ class AdminDashboard extends StatelessWidget {
             'Latest updates from your team',
             style: TextStyle(
               fontSize: 14,
-              color: Colors.grey.shade600,
+              color: const Color(0xFF7E57C2).withOpacity(0.8),
+              fontWeight: FontWeight.w500,
             ),
           ),
           const SizedBox(height: 20),
@@ -1229,8 +1353,8 @@ class AdminDashboard extends StatelessWidget {
       children: [
         for (int i = 0; i < 3; i++) ...[
           Shimmer.fromColors(
-            baseColor: Colors.grey.shade300,
-            highlightColor: Colors.grey.shade100,
+            baseColor: const Color(0xFFEDE9FE),
+            highlightColor: const Color(0xFFF5F3FF),
             child: Container(
               margin: const EdgeInsets.only(bottom: 16),
               padding: const EdgeInsets.all(16),
@@ -1238,8 +1362,8 @@ class AdminDashboard extends StatelessWidget {
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
-                  color: Colors.grey.shade200,
-                  width: 1,
+                  color: const Color(0xFFEDE9FE),
+                  width: 1.5,
                 ),
               ),
               child: Row(
@@ -1301,12 +1425,21 @@ class AdminDashboard extends StatelessWidget {
           width: 100,
           height: 100,
           decoration: BoxDecoration(
-            color: Colors.red.withOpacity(0.1),
+            gradient: LinearGradient(
+              colors: [
+                const Color(0xFFFDF2F8),
+                const Color(0xFFFBCFE8),
+              ],
+            ),
             shape: BoxShape.circle,
+            border: Border.all(
+              color: const Color(0xFFF472B6),
+              width: 3,
+            ),
           ),
           child: Icon(
-            Icons.error_outline_rounded,
-            color: Colors.red[600],
+            Icons.error_rounded,
+            color: const Color(0xFFDB2777),
             size: 50,
           ),
         ),
@@ -1314,9 +1447,9 @@ class AdminDashboard extends StatelessWidget {
         Text(
           'Failed to Load Tasks',
           style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-            color: theme.colorScheme.onBackground,
+            fontSize: 20,
+            fontWeight: FontWeight.w800,
+            color: const Color(0xFFBE185D),
           ),
         ),
         const SizedBox(height: 8),
@@ -1327,7 +1460,7 @@ class AdminDashboard extends StatelessWidget {
               error,
               style: TextStyle(
                 fontSize: 14,
-                color: Colors.grey.shade600,
+                color: const Color(0xFFBE185D).withOpacity(0.8),
                 height: 1.5,
               ),
               textAlign: TextAlign.center,
@@ -1344,12 +1477,21 @@ class AdminDashboard extends StatelessWidget {
           width: 100,
           height: 100,
           decoration: BoxDecoration(
-            color: theme.primaryColor.withOpacity(0.1),
+            gradient: LinearGradient(
+              colors: [
+                const Color(0xFFF5F3FF),
+                const Color(0xFFEDE9FE),
+              ],
+            ),
             shape: BoxShape.circle,
+            border: Border.all(
+              color: const Color(0xFFC4B5FD),
+              width: 3,
+            ),
           ),
           child: Icon(
-            Icons.task_alt_outlined,
-            color: theme.primaryColor,
+            Icons.task_alt_rounded,
+            color: const Color(0xFF7E57C2),
             size: 50,
           ),
         ),
@@ -1357,9 +1499,9 @@ class AdminDashboard extends StatelessWidget {
         Text(
           'No Recent Tasks',
           style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-            color: theme.colorScheme.onBackground,
+            fontSize: 20,
+            fontWeight: FontWeight.w800,
+            color: const Color(0xFF5B21B6),
           ),
         ),
         const SizedBox(height: 8),
@@ -1367,28 +1509,48 @@ class AdminDashboard extends StatelessWidget {
           'Create new tasks to get started',
           style: TextStyle(
             fontSize: 14,
-            color: Colors.grey.shade600,
+            color: const Color(0xFF5B21B6).withOpacity(0.8),
+            fontWeight: FontWeight.w500,
           ),
         ),
         const SizedBox(height: 20),
-        ElevatedButton(
-          onPressed: () {
-            // Navigate to create task
-          },
-          style: ElevatedButton.styleFrom(
-            backgroundColor: theme.primaryColor,
-            foregroundColor: Colors.white,
-            padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
+        Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                const Color(0xFF7E57C2),
+                const Color(0xFF6D28D9),
+              ],
             ),
-            elevation: 0,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFF7E57C2).withOpacity(0.4),
+                blurRadius: 15,
+                offset: const Offset(0, 6),
+              ),
+            ],
           ),
-          child: const Text(
-            'Create First Task',
-            style: TextStyle(
-              fontWeight: FontWeight.w600,
-              fontSize: 16,
+          child: ElevatedButton(
+            onPressed: () {
+              // Navigate to create task
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.transparent,
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 18),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              elevation: 0,
+            ),
+            child: const Text(
+              'Create First Task',
+              style: TextStyle(
+                fontWeight: FontWeight.w700,
+                fontSize: 16,
+                letterSpacing: 0.3,
+              ),
             ),
           ),
         ),

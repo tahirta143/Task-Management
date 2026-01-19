@@ -212,7 +212,7 @@ class _TaskListScreenState extends State<TaskListScreen> {
                   style: TextStyle(fontWeight: FontWeight.w500),
                 ),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue[600],
+                  backgroundColor: Colors.deepPurple.shade400,
                   foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(
                     horizontal: 16,
@@ -228,20 +228,28 @@ class _TaskListScreenState extends State<TaskListScreen> {
         ],
         elevation: 1,
       ),
-      body: _isFirstLoad && taskProvider.isLoading
-          ? _buildShimmerLoading() // Shimmer for first load
-          : Column(
-        children: [
-          // Search and Filter Bar
-          _buildSearchFilterBar(taskProvider, screenWidth),
-
-          // Task List
-          Expanded(
-            child: _buildTaskList(taskProvider),
+      body: SafeArea(
+        bottom: false,
+        child: Padding(
+          padding: EdgeInsets.only(
+            bottom: 50, // Height of the bottom nav bar
           ),
-        ],
+
+        child: _isFirstLoad && taskProvider.isLoading
+            ? _buildShimmerLoading() // Shimmer for first load
+            : Column(
+          children: [
+            // Search and Filter Bar
+            _buildSearchFilterBar(taskProvider, screenWidth),
+
+            // Task List
+            Expanded(
+              child: _buildTaskList(taskProvider),
+            ),
+          ],
+        ),
       ),
-    );
+    ));
   }
 
   // Shimmer Loading Screen for first load

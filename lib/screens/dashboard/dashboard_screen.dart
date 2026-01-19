@@ -195,13 +195,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
         },
         role: authProvider.role ?? 'staff',
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _onRefresh,
-        tooltip: 'Refresh Dashboard',
-        backgroundColor: Colors.blue,
-        foregroundColor: Colors.white,
-        child: const Icon(Icons.refresh),
-      ),
+      // floatingActionButton: FloatingActionButton(
+      //   onPressed: _onRefresh,
+      //   tooltip: 'Refresh Dashboard',
+      //   backgroundColor: Colors.blue,
+      //   foregroundColor: Colors.white,
+      //   child: const Icon(Icons.refresh),
+      // ),
     );
   }
 

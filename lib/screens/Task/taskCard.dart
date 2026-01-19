@@ -415,16 +415,16 @@ class TaskCard extends StatelessWidget {
         margin: const EdgeInsets.only(top: 12),
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
-          color: Colors.blue[50],
+          color: Colors.deepPurple.shade50,
           borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: Colors.blue[100]!),
+          border: Border.all(color: Colors.deepPurple.shade300!),
         ),
         child: Row(
           children: [
             Icon(
               Icons.checklist,
               size: isSmallPhone ? 16 : 18,
-              color: Colors.blue[600],
+              color: Colors.deepPurple,
             ),
             const SizedBox(width: 8),
             Expanded(
@@ -436,7 +436,7 @@ class TaskCard extends StatelessWidget {
                     style: TextStyle(
                       fontSize: isSmallPhone ? 12 : 14,
                       fontWeight: FontWeight.w500,
-                      color: Colors.blue[800],
+                      color: Colors.deepPurple,
                     ),
                   ),
                   if (!isSmallPhone)
@@ -444,7 +444,7 @@ class TaskCard extends StatelessWidget {
                       '$completedSubTasks completed • ${totalHours}h total',
                       style: TextStyle(
                         fontSize: 11,
-                        color: Colors.blue[600],
+                        color: Colors.deepPurple,
                       ),
                     ),
                 ],
@@ -456,13 +456,13 @@ class TaskCard extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
-                  color: Colors.blue[700],
+                  color: Colors.deepPurple,
                 ),
               ),
             if (!isSmallPhone)
               Icon(
                 Icons.chevron_right,
-                color: Colors.blue[400],
+                color: Colors.deepPurple,
               ),
           ],
         ),
@@ -490,8 +490,8 @@ class TaskCard extends StatelessWidget {
             icon: const Icon(Icons.visibility_outlined, size: 16),
             label: hasSpaceForText ? const Text('View Details') : const SizedBox.shrink(),
             style: ElevatedButton.styleFrom(
-              foregroundColor: Colors.blue[600],
-              backgroundColor: Colors.blue[50],
+              foregroundColor: Colors.deepPurple,
+              backgroundColor: Colors.deepPurple.shade50,
               padding: EdgeInsets.symmetric(
                 horizontal: isSmallPhone ? 8 : 12,
                 vertical: isSmallPhone ? 8 : 10,

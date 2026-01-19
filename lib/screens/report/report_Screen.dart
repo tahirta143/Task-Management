@@ -12,6 +12,9 @@ class ReportScreen extends StatefulWidget {
 }
 
 class _ReportScreenState extends State<ReportScreen> {
+  final Color primaryColor = const Color(0xFF8B5CF6);
+  final Color secondaryColor = const Color(0xFF7E57C2);
+
   @override
   void initState() {
     super.initState();
@@ -36,92 +39,174 @@ class _ReportScreenState extends State<ReportScreen> {
   Widget build(BuildContext context) {
     final reportProvider = context.watch<ReportProvider>();
     final authProvider = context.watch<AuthProvider>();
+    final mediaQuery = MediaQuery.of(context);
 
     return Scaffold(
       appBar: AppBar(
+
         title: const Text('Task Reports'),
+        backgroundColor: Colors.grey[50],
+        foregroundColor: Colors.black,
+        elevation: 0,
         actions: [
           // Debug button
           IconButton(
-            icon: const Icon(Icons.bug_report),
+            icon: const Icon(Icons.bug_report,color: Colors.deepPurple,),
             onPressed: () => _debugReport(reportProvider),
             tooltip: 'Debug Report',
           ),
           IconButton(
-            icon: const Icon(Icons.filter_alt),
+            icon: const Icon(Icons.filter_alt,color: Colors.deepPurple,),
             onPressed: () => _showFilterDialog(context, reportProvider, authProvider),
           ),
           IconButton(
-            icon: const Icon(Icons.refresh),
+            icon: const Icon(Icons.refresh,color: Colors.deepPurple,),
             onPressed: () => reportProvider.fetchReport(),
           ),
         ],
       ),
-      body: _buildBody(reportProvider, authProvider),
-    );
+      body: SafeArea(
+          bottom: false,
+          child: Padding(
+            padding: EdgeInsets.only(
+              bottom: 50, // Height of the bottom nav bar
+            ),
+
+          child: _buildBody(reportProvider, authProvider, mediaQuery)),
+    ));
   }
 
-  Widget _buildBody(ReportProvider reportProvider, AuthProvider authProvider) {
+  Widget _buildBody(ReportProvider reportProvider, AuthProvider authProvider, MediaQueryData mediaQuery) {
+    final isSmallScreen = mediaQuery.size.width < 600;
+    final padding = isSmallScreen ? 12.0 : 24.0;
+
     if (reportProvider.isLoading) {
-      return const Center(child: CircularProgressIndicator());
+      return Center(
+        child: CircularProgressIndicator(
+          valueColor: AlwaysStoppedAnimation<Color>(primaryColor),
+        ),
+      );
     }
 
     if (reportProvider.error != null) {
       return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Text(
-                'Error: ${reportProvider.error}',
-                textAlign: TextAlign.center,
-                style: const TextStyle(color: Colors.red),
+        child: Padding(
+          padding: EdgeInsets.all(padding),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.error_outline,
+                size: 64,
+                color: Colors.red[300],
               ),
-            ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () => reportProvider.fetchReport(),
-              child: const Text('Retry'),
-            ),
-          ],
+              const SizedBox(height: 20),
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Text(
+                  'Error: ${reportProvider.error}',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Colors.red,
+                    fontSize: mediaQuery.size.width < 350 ? 14 : 16,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: () => reportProvider.fetchReport(),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: primaryColor,
+                  foregroundColor: Colors.white,
+                  padding: EdgeInsets.symmetric(
+                    horizontal: mediaQuery.size.width * 0.1,
+                    vertical: 16,
+                  ),
+                ),
+                child: Text(
+                  'Retry',
+                  style: TextStyle(
+                    fontSize: mediaQuery.size.width < 350 ? 14 : 16,
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       );
     }
 
     if (reportProvider.report == null) {
       return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Text('No report data available'),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () => reportProvider.fetchReport(),
-              child: const Text('Load Report'),
-            ),
-          ],
+        child: Padding(
+          padding: EdgeInsets.all(padding),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.assessment,
+                size: 80,
+                color: primaryColor.withOpacity(0.5),
+              ),
+              const SizedBox(height: 20),
+              Text(
+                'No report data available',
+                style: TextStyle(
+                  fontSize: mediaQuery.size.width < 350 ? 16 : 18,
+                  color: Colors.grey[600],
+                ),
+              ),
+              const SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: () => reportProvider.fetchReport(),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: primaryColor,
+                  foregroundColor: Colors.white,
+                  padding: EdgeInsets.symmetric(
+                    horizontal: mediaQuery.size.width * 0.1,
+                    vertical: 16,
+                  ),
+                ),
+                child: Text(
+                  'Load Report',
+                  style: TextStyle(
+                    fontSize: mediaQuery.size.width < 350 ? 14 : 16,
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       );
     }
 
     return RefreshIndicator(
       onRefresh: () => reportProvider.fetchReport(),
+      color: primaryColor,
       child: CustomScrollView(
         slivers: [
           // Filter description
           SliverToBoxAdapter(
             child: Container(
-              padding: const EdgeInsets.all(12),
-              color: Colors.grey[100],
+              padding: EdgeInsets.all(padding),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [primaryColor.withOpacity(0.1), secondaryColor.withOpacity(0.05)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+              ),
               child: Row(
                 children: [
-                  const Icon(Icons.info_outline, size: 16),
+                  Icon(Icons.info_outline, size: 16, color: primaryColor),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
                       reportProvider.filterDescription,
-                      style: const TextStyle(fontSize: 12),
+                      style: TextStyle(
+                        fontSize: mediaQuery.size.width < 350 ? 11 : 12,
+                        color: Colors.grey[700],
+                      ),
                     ),
                   ),
                   if (reportProvider.selectedUserId != null ||
@@ -131,7 +216,15 @@ class _ReportScreenState extends State<ReportScreen> {
                       reportProvider.searchQuery.isNotEmpty)
                     TextButton(
                       onPressed: () => reportProvider.clearFilters(),
-                      child: const Text('Clear Filters'),
+                      style: TextButton.styleFrom(
+                        foregroundColor: primaryColor,
+                      ),
+                      child: Text(
+                        'Clear Filters',
+                        style: TextStyle(
+                          fontSize: mediaQuery.size.width < 350 ? 11 : 12,
+                        ),
+                      ),
                     ),
                 ],
               ),
@@ -140,17 +233,17 @@ class _ReportScreenState extends State<ReportScreen> {
 
           // Summary Cards
           SliverPadding(
-            padding: const EdgeInsets.all(16),
+            padding: EdgeInsets.all(padding),
             sliver: SliverGrid(
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                crossAxisSpacing: 12,
-                mainAxisSpacing: 12,
-                childAspectRatio: 1.5,
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: isSmallScreen ? 2 : 4,
+                crossAxisSpacing: padding,
+                mainAxisSpacing: padding,
+                childAspectRatio: isSmallScreen ? 1.2 : 1.5,
               ),
               delegate: SliverChildBuilderDelegate(
                     (context, index) {
-                  return _buildSummaryCard(index, reportProvider);
+                  return _buildSummaryCard(index, reportProvider, mediaQuery);
                 },
                 childCount: 6,
               ),
@@ -159,36 +252,45 @@ class _ReportScreenState extends State<ReportScreen> {
 
           // Chart section
           SliverToBoxAdapter(
-            child: _buildChartSection(reportProvider),
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: padding),
+              child: _buildChartSection(reportProvider, mediaQuery),
+            ),
           ),
 
           // Tasks section
           SliverToBoxAdapter(
-            child: _buildTasksSection(reportProvider),
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: padding),
+              child: _buildTasksSection(reportProvider, mediaQuery),
+            ),
           ),
 
           // Users section
           SliverToBoxAdapter(
-            child: _buildUsersSection(reportProvider),
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: padding),
+              child: _buildUsersSection(reportProvider, mediaQuery),
+            ),
           ),
 
           // Add some bottom padding
-          const SliverToBoxAdapter(
-            child: SizedBox(height: 20),
+          SliverToBoxAdapter(
+            child: SizedBox(height: padding * 2),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildSummaryCard(int index, ReportProvider reportProvider) {
+  Widget _buildSummaryCard(int index, ReportProvider reportProvider, MediaQueryData mediaQuery) {
     final summary = reportProvider.filteredSummary;
     final List<Map<String, dynamic>> cards = [
       {
         'title': 'Total Tasks',
         'value': summary.totalTasks.toString(),
         'icon': Icons.task,
-        'color': Colors.blue,
+        'color': primaryColor,
       },
       {
         'title': 'Completed',
@@ -212,7 +314,7 @@ class _ReportScreenState extends State<ReportScreen> {
         'title': 'Total Hours',
         'value': '${summary.totalHours}h',
         'icon': Icons.access_time,
-        'color': Colors.purple,
+        'color': secondaryColor,
       },
       {
         'title': 'Completion Rate',
@@ -223,114 +325,207 @@ class _ReportScreenState extends State<ReportScreen> {
     ];
 
     final card = cards[index];
+    final isSmallScreen = mediaQuery.size.width < 350;
+
     return Card(
-      elevation: 2,
-      child: Padding(
-        padding: const EdgeInsets.all(7),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(card['icon'] as IconData, color: card['color'] as Color, size: 32),
-            const SizedBox(height: 8),
-            Text(
-              card['value'] as String,
-              style: const TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
+      elevation: 1,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Container(
+        constraints: BoxConstraints(
+          minHeight: 100, // Ensure minimum height
+        ),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16),
+          gradient: LinearGradient(
+            colors: [
+              (card['color'] as Color).withOpacity(0.1),
+              (card['color'] as Color).withOpacity(0.05),
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+        ),
+        child: Padding(
+          padding: EdgeInsets.all(isSmallScreen ? 4 : 12),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min, // Add this
+            children: [
+              Container(
+                width: isSmallScreen ? 36 : 48,
+                height: isSmallScreen ? 36 : 48,
+                decoration: BoxDecoration(
+                  color: (card['color'] as Color).withOpacity(0.2),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  card['icon'] as IconData,
+                  color: card['color'] as Color,
+                  size: isSmallScreen ? 20 : 24,
+                ),
               ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              card['title'] as String,
-              style: const TextStyle(
-                fontSize: 12,
-                color: Colors.grey,
+              SizedBox(height: isSmallScreen ? 4 : 8), // Reduced spacing
+              FittedBox( // Added FittedBox for value
+                fit: BoxFit.scaleDown,
+                child: Text(
+                  card['value'] as String,
+                  style: TextStyle(
+                    fontSize: isSmallScreen ? 18 : 24,
+                    fontWeight: FontWeight.bold,
+                    color: card['color'] as Color,
+                  ),
+                ),
               ),
-              textAlign: TextAlign.center,
-            ),
-          ],
+              SizedBox(height: 2), // Reduced spacing
+              Text(
+                card['title'] as String,
+                textAlign: TextAlign.center,
+                maxLines: 2, // Limit to 2 lines
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontSize: isSmallScreen ? 10 : 12,
+                  color: Colors.grey[600],
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildChartSection(ReportProvider reportProvider) {
+  Widget _buildChartSection(ReportProvider reportProvider, MediaQueryData mediaQuery) {
     final chartData = reportProvider.filteredChartData;
     final totalTasks = reportProvider.filteredSummary.totalTasks;
+    final isSmallScreen = mediaQuery.size.width < 350;
 
     return Card(
-      margin: const EdgeInsets.all(16),
+      elevation: 1,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
+      margin: EdgeInsets.only(bottom: 16),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.all(isSmallScreen ? 12 : 20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Task Distribution',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
+            Row(
+              children: [
+                Icon(Icons.bar_chart, color: primaryColor, size: 20),
+                const SizedBox(width: 8),
+                Text(
+                  'Task Distribution',
+                  style: TextStyle(
+                    fontSize: isSmallScreen ? 16 : 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.grey[800],
+                  ),
+                ),
+              ],
             ),
             const SizedBox(height: 16),
-            LayoutBuilder(
-              builder: (context, constraints) {
-                final availableWidth = constraints.maxWidth;
-                final isSmallScreen = availableWidth < 350;
+            SizedBox(
+              height: isSmallScreen ? 200 : 240,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: chartData.map((data) {
+                  final percentage = totalTasks > 0
+                      ? (data.value / totalTasks * 100)
+                      : 0;
 
-                return SizedBox(
-                  height: isSmallScreen ? 180 : 200,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: chartData.map((data) {
-                      final percentage = totalTasks > 0
-                          ? (data.value / totalTasks * 100)
-                          : 0;
-
-                      return Container(
-                        width: isSmallScreen ? 50 : 60,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              '${data.value}',
-                              style: TextStyle(
-                                fontSize: isSmallScreen ? 11 : 12,
-                                fontWeight: FontWeight.bold,
+                  return Expanded(
+                    child: Container(
+                      margin: EdgeInsets.symmetric(horizontal: 4),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Container(
+                            width: double.infinity,
+                            height: percentage * (isSmallScreen ? 1.0 : 1.2),
+                            margin: EdgeInsets.symmetric(
+                              horizontal: isSmallScreen ? 8 : 12,
+                            ),
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [
+                                  data.colorValue.withOpacity(0.8),
+                                  data.colorValue.withOpacity(0.5),
+                                ],
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                              ),
+                              borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(8),
+                                topRight: Radius.circular(8),
                               ),
                             ),
-                            const SizedBox(height: 6),
-                            Container(
-                              width: isSmallScreen ? 30 : 40,
-                              height: percentage * (isSmallScreen ? 1.0 : 1.2),
-                              decoration: BoxDecoration(
-                                color: data.colorValue,
-                                borderRadius: BorderRadius.circular(4),
-                              ),
-                            ),
-                            const SizedBox(height: 6),
-                            SizedBox(
-                              width: isSmallScreen ? 50 : 60,
+                            child: Center(
                               child: Text(
-                                data.name,
-                                textAlign: TextAlign.center,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
+                                '${data.value}',
                                 style: TextStyle(
-                                  fontSize: isSmallScreen ? 10 : 11,
+                                  fontSize: isSmallScreen ? 10 : 12,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
                                 ),
                               ),
                             ),
-                          ],
-                        ),
-                      );
-                    }).toList(),
+                          ),
+                          const SizedBox(height: 8),
+                          Padding(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: isSmallScreen ? 2 : 4,
+                            ),
+                            child: Text(
+                              data.name,
+                              textAlign: TextAlign.center,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                fontSize: isSmallScreen ? 9 : 11,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.grey[700],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                }).toList(),
+              ),
+            ),
+            const SizedBox(height: 8),
+            Container(
+              height: 1,
+              color: Colors.grey[200],
+              margin: EdgeInsets.symmetric(vertical: 8),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Total: $totalTasks tasks',
+                  style: TextStyle(
+                    fontSize: isSmallScreen ? 11 : 12,
+                    color: Colors.grey[600],
                   ),
-                );
-              },
+                ),
+                Text(
+                  'Filtered View',
+                  style: TextStyle(
+                    fontSize: isSmallScreen ? 11 : 12,
+                    color: primaryColor,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
             ),
           ],
         ),
@@ -338,31 +533,41 @@ class _ReportScreenState extends State<ReportScreen> {
     );
   }
 
-  Widget _buildTasksSection(ReportProvider reportProvider) {
+  Widget _buildTasksSection(ReportProvider reportProvider, MediaQueryData mediaQuery) {
     final tasks = reportProvider.filteredDetailedTasks;
+    final isSmallScreen = mediaQuery.size.width < 350;
 
     if (tasks.isEmpty) {
       return Card(
-        margin: const EdgeInsets.all(16),
+        elevation: 1,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        margin: EdgeInsets.only(bottom: 16),
         child: Padding(
-          padding: const EdgeInsets.all(32),
+          padding: EdgeInsets.all(isSmallScreen ? 20 : 32),
           child: Column(
             children: [
-              Icon(Icons.task, size: 48, color: Colors.grey[400]),
+              Icon(
+                Icons.task,
+                size: isSmallScreen ? 48 : 64,
+                color: primaryColor.withOpacity(0.3),
+              ),
               const SizedBox(height: 16),
-              const Text(
+              Text(
                 'No tasks found',
                 style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.grey,
+                  fontSize: isSmallScreen ? 16 : 18,
+                  color: Colors.grey[600],
+                  fontWeight: FontWeight.w500,
                 ),
               ),
               const SizedBox(height: 8),
-              const Text(
+              Text(
                 'Try changing your filters',
                 style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.grey,
+                  fontSize: isSmallScreen ? 12 : 14,
+                  color: Colors.grey[500],
                 ),
               ),
             ],
@@ -372,37 +577,78 @@ class _ReportScreenState extends State<ReportScreen> {
     }
 
     return Card(
-      margin: const EdgeInsets.all(16),
+      elevation: 1,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
+      margin: EdgeInsets.only(bottom: 16),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.all(isSmallScreen ? 12 : 20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
-                  'Detailed Tasks',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
+                Row(
+                  children: [
+                    Icon(Icons.list_alt, color: primaryColor, size: 20),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Detailed Tasks',
+                      style: TextStyle(
+                        fontSize: isSmallScreen ? 16 : 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.grey[800],
+                      ),
+                    ),
+                  ],
                 ),
-                Chip(
-                  label: Text('${tasks.length} tasks'),
+                Container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: isSmallScreen ? 8 : 12,
+                    vertical: isSmallScreen ? 4 : 6,
+                  ),
+                  decoration: BoxDecoration(
+                    color: primaryColor.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text(
+                    '${tasks.length} tasks',
+                    style: TextStyle(
+                      fontSize: isSmallScreen ? 11 : 12,
+                      color: primaryColor,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
                 ),
               ],
             ),
             const SizedBox(height: 16),
-            ...tasks.take(5).map((task) => _buildTaskItem(task)),
+            ...tasks.take(5).map((task) => _buildTaskItem(task, mediaQuery)),
             if (tasks.length > 5)
               Center(
-                child: TextButton(
-                  onPressed: () {
-                    // Navigate to detailed tasks screen
-                    _showAllTasksDialog(context, tasks);
-                  },
-                  child: const Text('View All Tasks'),
+                child: Padding(
+                  padding: EdgeInsets.only(top: 16),
+                  child: OutlinedButton.icon(
+                    onPressed: () {
+                      _showAllTasksDialog(context, tasks);
+                    },
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: primaryColor,
+                      side: BorderSide(color: primaryColor),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                    ),
+                    icon: Icon(Icons.visibility, size: isSmallScreen ? 16 : 18),
+                    label: Text(
+                      'View All Tasks',
+                      style: TextStyle(
+                        fontSize: isSmallScreen ? 13 : 14,
+                      ),
+                    ),
+                  ),
                 ),
               ),
           ],
@@ -411,27 +657,48 @@ class _ReportScreenState extends State<ReportScreen> {
     );
   }
 
-  Widget _buildTaskItem(TaskDetail task) {
+  Widget _buildTaskItem(TaskDetail task, MediaQueryData mediaQuery) {
+    final isSmallScreen = mediaQuery.size.width < 350;
+
     return Container(
-      margin: const EdgeInsets.only(bottom: 8),
+      margin: EdgeInsets.only(bottom: isSmallScreen ? 8 : 12),
+      decoration: BoxDecoration(
+        border: Border(
+          bottom: BorderSide(
+            color: Colors.grey[200]!,
+            width: 1,
+          ),
+        ),
+      ),
       child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(vertical: 4, horizontal: 0),
+        contentPadding: EdgeInsets.symmetric(
+          vertical: isSmallScreen ? 4 : 8,
+          horizontal: 0,
+        ),
         leading: Container(
-          width: 40,
-          height: 40,
+          width: isSmallScreen ? 36 : 44,
+          height: isSmallScreen ? 36 : 44,
           decoration: BoxDecoration(
-            color: task.statusColor.withOpacity(0.1),
+            gradient: LinearGradient(
+              colors: [
+                task.statusColor.withOpacity(0.2),
+                task.statusColor.withOpacity(0.1),
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
             shape: BoxShape.circle,
           ),
           child: Icon(
             _getStatusIcon(task.status),
             color: task.statusColor,
-            size: 20,
+            size: isSmallScreen ? 18 : 20,
           ),
         ),
         title: Text(
           task.title,
-          style: const TextStyle(
+          style: TextStyle(
+            fontSize: isSmallScreen ? 13 : 15,
             fontWeight: FontWeight.w500,
           ),
           maxLines: 1,
@@ -443,37 +710,79 @@ class _ReportScreenState extends State<ReportScreen> {
               : task.company,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
+          style: TextStyle(
+            fontSize: isSmallScreen ? 11 : 12,
+            color: Colors.grey[600],
+          ),
         ),
-        trailing: SizedBox(
-          width: 100,
+        trailing: Container(
+          constraints: BoxConstraints(
+            maxWidth: isSmallScreen ? 80 : 100,
+          ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.end,
             mainAxisSize: MainAxisSize.min,
             children: [
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                padding: EdgeInsets.symmetric(
+                  horizontal: isSmallScreen ? 6 : 8,
+                  vertical: isSmallScreen ? 2 : 4,
+                ),
                 decoration: BoxDecoration(
                   color: task.priorityColor.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: task.priorityColor.withOpacity(0.3),
+                    width: 1,
+                  ),
                 ),
                 child: Text(
                   task.priorityText,
                   style: TextStyle(
                     color: task.priorityColor,
                     fontWeight: FontWeight.bold,
-                    fontSize: 10,
+                    fontSize: isSmallScreen ? 9 : 10,
                   ),
                 ),
               ),
               const SizedBox(height: 4),
-              Text(
-                '${task.progress}%',
-                style: TextStyle(
-                  color: task.progress == 100 ? Colors.green : Colors.blue,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w500,
-                ),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: isSmallScreen ? 40 : 50,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: Colors.grey[200],
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                    child: FractionallySizedBox(
+                      widthFactor: task.progress / 100,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: task.progress == 100
+                                ? [Colors.green, Colors.greenAccent]
+                                : [primaryColor, secondaryColor],
+                            begin: Alignment.centerLeft,
+                            end: Alignment.centerRight,
+                          ),
+                          borderRadius: BorderRadius.circular(2),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    '${task.progress}%',
+                    style: TextStyle(
+                      color: task.progress == 100 ? Colors.green : primaryColor,
+                      fontSize: isSmallScreen ? 10 : 11,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
@@ -482,23 +791,33 @@ class _ReportScreenState extends State<ReportScreen> {
     );
   }
 
-  Widget _buildUsersSection(ReportProvider reportProvider) {
+  Widget _buildUsersSection(ReportProvider reportProvider, MediaQueryData mediaQuery) {
     final users = reportProvider.filteredUserReports;
+    final isSmallScreen = mediaQuery.size.width < 350;
 
     if (users.isEmpty) {
       return Card(
-        margin: const EdgeInsets.all(16),
+        elevation: 1,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        margin: EdgeInsets.only(bottom: 16),
         child: Padding(
-          padding: const EdgeInsets.all(32),
+          padding: EdgeInsets.all(isSmallScreen ? 20 : 32),
           child: Column(
             children: [
-              Icon(Icons.people, size: 48, color: Colors.grey[400]),
+              Icon(
+                Icons.people,
+                size: isSmallScreen ? 48 : 64,
+                color: primaryColor.withOpacity(0.3),
+              ),
               const SizedBox(height: 16),
-              const Text(
+              Text(
                 'No user data available',
                 style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.grey,
+                  fontSize: isSmallScreen ? 16 : 18,
+                  color: Colors.grey[600],
+                  fontWeight: FontWeight.w500,
                 ),
               ),
             ],
@@ -508,37 +827,78 @@ class _ReportScreenState extends State<ReportScreen> {
     }
 
     return Card(
-      margin: const EdgeInsets.all(16),
+      elevation: 1,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
+      margin: EdgeInsets.only(bottom: 16),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.all(isSmallScreen ? 12 : 20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
-                  'User Performance',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
+                Row(
+                  children: [
+                    Icon(Icons.people_alt, color: primaryColor, size: 20),
+                    const SizedBox(width: 8),
+                    Text(
+                      'User Performance',
+                      style: TextStyle(
+                        fontSize: isSmallScreen ? 16 : 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.grey[800],
+                      ),
+                    ),
+                  ],
                 ),
-                Chip(
-                  label: Text('${users.length} users'),
+                Container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: isSmallScreen ? 8 : 12,
+                    vertical: isSmallScreen ? 4 : 6,
+                  ),
+                  decoration: BoxDecoration(
+                    color: primaryColor.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text(
+                    '${users.length} users',
+                    style: TextStyle(
+                      fontSize: isSmallScreen ? 11 : 12,
+                      color: primaryColor,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
                 ),
               ],
             ),
             const SizedBox(height: 16),
-            ...users.take(5).map((user) => _buildUserItem(user)),
+            ...users.take(5).map((user) => _buildUserItem(user, mediaQuery)),
             if (users.length > 5)
               Center(
-                child: TextButton(
-                  onPressed: () {
-                    // Navigate to user performance screen
-                    _showAllUsersDialog(context, users);
-                  },
-                  child: const Text('View All Users'),
+                child: Padding(
+                  padding: EdgeInsets.only(top: 16),
+                  child: OutlinedButton.icon(
+                    onPressed: () {
+                      _showAllUsersDialog(context, users);
+                    },
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: primaryColor,
+                      side: BorderSide(color: primaryColor),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                    ),
+                    icon: Icon(Icons.people_outline, size: isSmallScreen ? 16 : 18),
+                    label: Text(
+                      'View All Users',
+                      style: TextStyle(
+                        fontSize: isSmallScreen ? 13 : 14,
+                      ),
+                    ),
+                  ),
                 ),
               ),
           ],
@@ -547,25 +907,53 @@ class _ReportScreenState extends State<ReportScreen> {
     );
   }
 
-  Widget _buildUserItem(UserReport user) {
+  Widget _buildUserItem(UserReport user, MediaQueryData mediaQuery) {
+    final isSmallScreen = mediaQuery.size.width < 350;
+
     return Container(
-      margin: const EdgeInsets.only(bottom: 8),
+      margin: EdgeInsets.only(bottom: isSmallScreen ? 8 : 12),
+      decoration: BoxDecoration(
+        border: Border(
+          bottom: BorderSide(
+            color: Colors.grey[200]!,
+            width: 1,
+          ),
+        ),
+      ),
       child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(vertical: 4, horizontal: 0),
-        leading: CircleAvatar(
-          radius: 18,
-          backgroundColor: Colors.blue[100],
-          child: Text(
-            user.name.isNotEmpty ? user.name.substring(0, 1).toUpperCase() : '?',
-            style: const TextStyle(
-              color: Colors.blue,
-              fontSize: 14,
+        contentPadding: EdgeInsets.symmetric(
+          vertical: isSmallScreen ? 4 : 8,
+          horizontal: 0,
+        ),
+        leading: Container(
+          width: isSmallScreen ? 36 : 44,
+          height: isSmallScreen ? 36 : 44,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                primaryColor.withOpacity(0.2),
+                secondaryColor.withOpacity(0.1),
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            shape: BoxShape.circle,
+          ),
+          child: Center(
+            child: Text(
+              user.name.isNotEmpty ? user.name.substring(0, 1).toUpperCase() : '?',
+              style: TextStyle(
+                color: primaryColor,
+                fontSize: isSmallScreen ? 14 : 16,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
         ),
         title: Text(
           user.name.isNotEmpty ? user.name : 'Unknown User',
-          style: const TextStyle(
+          style: TextStyle(
+            fontSize: isSmallScreen ? 13 : 15,
             fontWeight: FontWeight.w500,
           ),
           maxLines: 1,
@@ -575,38 +963,83 @@ class _ReportScreenState extends State<ReportScreen> {
           user.email.isNotEmpty ? user.email : 'No email',
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
+          style: TextStyle(
+            fontSize: isSmallScreen ? 11 : 12,
+            color: Colors.grey[600],
+          ),
         ),
-        trailing: SizedBox(
-          width: 100,
+        trailing: Container(
+          constraints: BoxConstraints(
+            maxWidth: isSmallScreen ? 80 : 100,
+          ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.end,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(
-                '${user.totalTasks} tasks',
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 11,
-                ),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.task,
+                    size: isSmallScreen ? 12 : 14,
+                    color: Colors.grey[500],
+                  ),
+                  const SizedBox(width: 2),
+                  Text(
+                    '${user.totalTasks}',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: isSmallScreen ? 11 : 12,
+                      color: Colors.grey[700],
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 4),
-              SizedBox(
-                height: 4,
-                child: LinearProgressIndicator(
-                  value: user.completionRate / 100,
-                  backgroundColor: Colors.grey[200],
-                  valueColor: AlwaysStoppedAnimation<Color>(
-                    user.completionRate >= 80 ? Colors.green :
-                    user.completionRate >= 50 ? Colors.orange : Colors.red,
+              const SizedBox(height: 6),
+              Container(
+                width: isSmallScreen ? 60 : 80,
+                height: 6,
+                decoration: BoxDecoration(
+                  color: Colors.grey[200],
+                  borderRadius: BorderRadius.circular(3),
+                ),
+                child: FractionallySizedBox(
+                  widthFactor: user.completionRate / 100,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          user.completionRate >= 80
+                              ? Colors.green
+                              : user.completionRate >= 50
+                              ? Colors.orange
+                              : Colors.red,
+                          user.completionRate >= 80
+                              ? Colors.greenAccent
+                              : user.completionRate >= 50
+                              ? Colors.orangeAccent
+                              : Colors.redAccent,
+                        ],
+                        begin: Alignment.centerLeft,
+                        end: Alignment.centerRight,
+                      ),
+                      borderRadius: BorderRadius.circular(3),
+                    ),
                   ),
                 ),
               ),
               const SizedBox(height: 4),
               Text(
                 '${user.completionRate.toStringAsFixed(1)}%',
-                style: const TextStyle(
-                  fontSize: 10,
+                style: TextStyle(
+                  fontSize: isSmallScreen ? 10 : 11,
+                  fontWeight: FontWeight.w500,
+                  color: user.completionRate >= 80
+                      ? Colors.green
+                      : user.completionRate >= 50
+                      ? Colors.orange
+                      : Colors.red,
                 ),
               ),
             ],
@@ -632,190 +1065,529 @@ class _ReportScreenState extends State<ReportScreen> {
       ReportProvider reportProvider,
       AuthProvider authProvider,
       ) async {
+    final mediaQuery = MediaQuery.of(context);
+    final isSmallScreen = mediaQuery.size.width < 350;
+
     await showDialog(
       context: context,
       builder: (context) {
-        return AlertDialog(
-          title: const Text('Filter Report'),
-          content: SingleChildScrollView(
-            child: SizedBox(
-              width: double.maxFinite,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // Month and Year
-                  Row(
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Container(
+            constraints: BoxConstraints(
+              maxWidth: 500,
+              maxHeight: mediaQuery.size.height * 0.8,
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  padding: EdgeInsets.all(isSmallScreen ? 16 : 20),
+                  decoration: BoxDecoration(
+                    color: primaryColor,
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(20),
+                      topRight: Radius.circular(20),
+                    ),
+                  ),
+                  child: Row(
                     children: [
-                      Expanded(
-                        child: DropdownButtonFormField<int>(
-                          value: reportProvider.selectedMonth,
-                          decoration: const InputDecoration(
-                            labelText: 'Month',
-                            isDense: true,
-                          ),
-                          items: reportProvider.availableMonths.map((month) {
-                            return DropdownMenuItem<int>(
-                              value: month['value'],
-                              child: Text(month['name']),
-                            );
-                          }).toList(),
-                          onChanged: (value) {
-                            reportProvider.setMonth(value!);
-                          },
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: DropdownButtonFormField<int>(
-                          value: reportProvider.selectedYear,
-                          decoration: const InputDecoration(
-                            labelText: 'Year',
-                            isDense: true,
-                          ),
-                          items: reportProvider.availableYears.map((year) {
-                            return DropdownMenuItem<int>(
-                              value: year,
-                              child: Text(year.toString()),
-                            );
-                          }).toList(),
-                          onChanged: (value) {
-                            reportProvider.setYear(value!);
-                          },
+                      Icon(Icons.filter_alt, color: Colors.white),
+                      const SizedBox(width: 8),
+                      Text(
+                        'Filter Report',
+                        style: TextStyle(
+                          fontSize: isSmallScreen ? 18 : 20,
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 16),
-
-                  // User filter (only for admin)
-                  if (authProvider.isAdmin)
-                    DropdownButtonFormField<String>(
-                      value: reportProvider.selectedUserId,
-                      decoration: const InputDecoration(
-                        labelText: 'Filter by User',
-                        hintText: 'Select user',
-                        isDense: true,
-                      ),
-                      items: [
-                        const DropdownMenuItem<String>(
-                          value: null,
-                          child: Text('All Users'),
+                ),
+                Expanded(
+                  child: SingleChildScrollView(
+                    padding: EdgeInsets.all(isSmallScreen ? 16 : 20),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        // Month and Year
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Month',
+                                    style: TextStyle(
+                                      fontSize: isSmallScreen ? 13 : 14,
+                                      fontWeight: FontWeight.w500,
+                                      color: Colors.grey[700],
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Container(
+                                    decoration: BoxDecoration(
+                                      color: Colors.grey[50],
+                                      borderRadius: BorderRadius.circular(12),
+                                      border: Border.all(
+                                        color: Colors.grey[300]!,
+                                      ),
+                                    ),
+                                    child: DropdownButtonHideUnderline(
+                                      child: DropdownButton<int>(
+                                        isExpanded: true,
+                                        value: reportProvider.selectedMonth,
+                                        padding: EdgeInsets.symmetric(horizontal: 12),
+                                        items: reportProvider.availableMonths.map((month) {
+                                          return DropdownMenuItem<int>(
+                                            value: month['value'],
+                                            child: Text(
+                                              month['name'],
+                                              style: TextStyle(
+                                                fontSize: isSmallScreen ? 13 : 14,
+                                              ),
+                                            ),
+                                          );
+                                        }).toList(),
+                                        onChanged: (value) {
+                                          reportProvider.setMonth(value!);
+                                        },
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            SizedBox(width: isSmallScreen ? 12 : 16),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Year',
+                                    style: TextStyle(
+                                      fontSize: isSmallScreen ? 13 : 14,
+                                      fontWeight: FontWeight.w500,
+                                      color: Colors.grey[700],
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Container(
+                                    decoration: BoxDecoration(
+                                      color: Colors.grey[50],
+                                      borderRadius: BorderRadius.circular(12),
+                                      border: Border.all(
+                                        color: Colors.grey[300]!,
+                                      ),
+                                    ),
+                                    child: DropdownButtonHideUnderline(
+                                      child: DropdownButton<int>(
+                                        isExpanded: true,
+                                        value: reportProvider.selectedYear,
+                                        padding: EdgeInsets.symmetric(horizontal: 12),
+                                        items: reportProvider.availableYears.map((year) {
+                                          return DropdownMenuItem<int>(
+                                            value: year,
+                                            child: Text(
+                                              year.toString(),
+                                              style: TextStyle(
+                                                fontSize: isSmallScreen ? 13 : 14,
+                                              ),
+                                            ),
+                                          );
+                                        }).toList(),
+                                        onChanged: (value) {
+                                          reportProvider.setYear(value!);
+                                        },
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
                         ),
-                        ...reportProvider.uniqueUsers.map((user) {
-                          return DropdownMenuItem<String>(
-                            value: user,
-                            child: Text(user),
-                          );
-                        }).toList(),
+                        SizedBox(height: isSmallScreen ? 16 : 20),
+
+                        // User filter (only for admin)
+                        if (authProvider.isAdmin)
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Filter by User',
+                                style: TextStyle(
+                                  fontSize: isSmallScreen ? 13 : 14,
+                                  fontWeight: FontWeight.w500,
+                                  color: Colors.grey[700],
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.grey[50],
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(
+                                    color: Colors.grey[300]!,
+                                  ),
+                                ),
+                                child: DropdownButtonHideUnderline(
+                                  child: DropdownButton<String>(
+                                    isExpanded: true,
+                                    value: reportProvider.selectedUserId,
+                                    hint: Padding(
+                                      padding: EdgeInsets.symmetric(horizontal: 12),
+                                      child: Text(
+                                        'Select user',
+                                        style: TextStyle(
+                                          fontSize: isSmallScreen ? 13 : 14,
+                                          color: Colors.grey[500],
+                                        ),
+                                      ),
+                                    ),
+                                    items: [
+                                      DropdownMenuItem<String>(
+                                        value: null,
+                                        child: Padding(
+                                          padding: EdgeInsets.symmetric(horizontal: 12),
+                                          child: Text(
+                                            'All Users',
+                                            style: TextStyle(
+                                              fontSize: isSmallScreen ? 13 : 14,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      ...reportProvider.uniqueUsers.map((user) {
+                                        return DropdownMenuItem<String>(
+                                          value: user,
+                                          child: Padding(
+                                            padding: EdgeInsets.symmetric(horizontal: 12),
+                                            child: Text(
+                                              user,
+                                              style: TextStyle(
+                                                fontSize: isSmallScreen ? 13 : 14,
+                                              ),
+                                            ),
+                                          ),
+                                        );
+                                      }).toList(),
+                                    ],
+                                    onChanged: (value) {
+                                      reportProvider.setUserId(value);
+                                    },
+                                  ),
+                                ),
+                              ),
+                              SizedBox(height: isSmallScreen ? 16 : 20),
+                            ],
+                          ),
+
+                        // Company filter (for admin, auto-set for manager)
+                        if (authProvider.isAdmin)
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Filter by Company',
+                                style: TextStyle(
+                                  fontSize: isSmallScreen ? 13 : 14,
+                                  fontWeight: FontWeight.w500,
+                                  color: Colors.grey[700],
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.grey[50],
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(
+                                    color: Colors.grey[300]!,
+                                  ),
+                                ),
+                                child: DropdownButtonHideUnderline(
+                                  child: DropdownButton<String>(
+                                    isExpanded: true,
+                                    value: reportProvider.selectedCompanyId,
+                                    hint: Padding(
+                                      padding: EdgeInsets.symmetric(horizontal: 12),
+                                      child: Text(
+                                        'Select company',
+                                        style: TextStyle(
+                                          fontSize: isSmallScreen ? 13 : 14,
+                                          color: Colors.grey[500],
+                                        ),
+                                      ),
+                                    ),
+                                    items: [
+                                      DropdownMenuItem<String>(
+                                        value: null,
+                                        child: Padding(
+                                          padding: EdgeInsets.symmetric(horizontal: 12),
+                                          child: Text(
+                                            'All Companies',
+                                            style: TextStyle(
+                                              fontSize: isSmallScreen ? 13 : 14,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      ...reportProvider.uniqueCompanies.map((company) {
+                                        return DropdownMenuItem<String>(
+                                          value: company,
+                                          child: Padding(
+                                            padding: EdgeInsets.symmetric(horizontal: 12),
+                                            child: Text(
+                                              company,
+                                              style: TextStyle(
+                                                fontSize: isSmallScreen ? 13 : 14,
+                                              ),
+                                            ),
+                                          ),
+                                        );
+                                      }).toList(),
+                                    ],
+                                    onChanged: (value) {
+                                      reportProvider.setCompanyId(value);
+                                    },
+                                  ),
+                                ),
+                              ),
+                              SizedBox(height: isSmallScreen ? 16 : 20),
+                            ],
+                          ),
+
+                        // Status filter
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Filter by Status',
+                              style: TextStyle(
+                                fontSize: isSmallScreen ? 13 : 14,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.grey[700],
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Container(
+                              decoration: BoxDecoration(
+                                color: Colors.grey[50],
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
+                                  color: Colors.grey[300]!,
+                                ),
+                              ),
+                              child: DropdownButtonHideUnderline(
+                                child: DropdownButton<String>(
+                                  isExpanded: true,
+                                  value: reportProvider.selectedStatus,
+                                  items: reportProvider.uniqueStatuses.map((status) {
+                                    return DropdownMenuItem<String>(
+                                      value: status == 'All' ? null : status,
+                                      child: Padding(
+                                        padding: EdgeInsets.symmetric(horizontal: 12),
+                                        child: Text(
+                                          status,
+                                          style: TextStyle(
+                                            fontSize: isSmallScreen ? 13 : 14,
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  }).toList(),
+                                  onChanged: (value) {
+                                    reportProvider.setStatus(value);
+                                  },
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: isSmallScreen ? 16 : 20),
+
+                        // Priority filter
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Filter by Priority',
+                              style: TextStyle(
+                                fontSize: isSmallScreen ? 13 : 14,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.grey[700],
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Container(
+                              decoration: BoxDecoration(
+                                color: Colors.grey[50],
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
+                                  color: Colors.grey[300]!,
+                                ),
+                              ),
+                              child: DropdownButtonHideUnderline(
+                                child: DropdownButton<String>(
+                                  isExpanded: true,
+                                  value: reportProvider.selectedPriority,
+                                  items: reportProvider.uniquePriorities.map((priority) {
+                                    return DropdownMenuItem<String>(
+                                      value: priority == 'All' ? null : priority,
+                                      child: Padding(
+                                        padding: EdgeInsets.symmetric(horizontal: 12),
+                                        child: Text(
+                                          priority,
+                                          style: TextStyle(
+                                            fontSize: isSmallScreen ? 13 : 14,
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  }).toList(),
+                                  onChanged: (value) {
+                                    reportProvider.setPriority(value);
+                                  },
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: isSmallScreen ? 16 : 20),
+
+                        // Search
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Search Tasks',
+                              style: TextStyle(
+                                fontSize: isSmallScreen ? 13 : 14,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.grey[700],
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            TextField(
+                              decoration: InputDecoration(
+                                hintText: 'Search tasks...',
+                                prefixIcon: Icon(Icons.search, color: primaryColor),
+                                filled: true,
+                                fillColor: Colors.grey[50],
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide: BorderSide(color: Colors.grey[300]!),
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide: BorderSide(color: Colors.grey[300]!),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide: BorderSide(color: primaryColor),
+                                ),
+                                contentPadding: EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: isSmallScreen ? 12 : 14,
+                                ),
+                              ),
+                              onChanged: (value) {
+                                reportProvider.setSearchQuery(value);
+                              },
+                            ),
+                          ],
+                        ),
                       ],
-                      onChanged: (value) {
-                        reportProvider.setUserId(value);
-                      },
                     ),
-
-                  // Company filter (for admin, auto-set for manager)
-                  if (authProvider.isAdmin)
-                    ...[
-                      const SizedBox(height: 16),
-                      DropdownButtonFormField<String>(
-                        value: reportProvider.selectedCompanyId,
-                        decoration: const InputDecoration(
-                          labelText: 'Filter by Company',
-                          hintText: 'Select company',
-                          isDense: true,
-                        ),
-                        items: [
-                          const DropdownMenuItem<String>(
-                            value: null,
-                            child: Text('All Companies'),
-                          ),
-                          ...reportProvider.uniqueCompanies.map((company) {
-                            return DropdownMenuItem<String>(
-                              value: company,
-                              child: Text(company),
-                            );
-                          }).toList(),
-                        ],
-                        onChanged: (value) {
-                          reportProvider.setCompanyId(value);
+                  ),
+                ),
+                Container(
+                  padding: EdgeInsets.all(isSmallScreen ? 16 : 20),
+                  decoration: BoxDecoration(
+                    border: Border(
+                      top: BorderSide(color: Colors.grey[200]!),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      TextButton(
+                        onPressed: () {
+                          reportProvider.clearFilters();
+                          Navigator.pop(context);
                         },
+                        style: TextButton.styleFrom(
+                          foregroundColor: Colors.red,
+                          padding: EdgeInsets.symmetric(
+                            horizontal: isSmallScreen ? 16 : 24,
+                            vertical: isSmallScreen ? 8 : 12,
+                          ),
+                        ),
+                        child: Text(
+                          'Clear All',
+                          style: TextStyle(
+                            fontSize: isSmallScreen ? 13 : 14,
+                          ),
+                        ),
+                      ),
+                      Row(
+                        children: [
+                          OutlinedButton(
+                            onPressed: () => Navigator.pop(context),
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: Colors.grey[700],
+                              side: BorderSide(color: Colors.grey[400]!),
+                              padding: EdgeInsets.symmetric(
+                                horizontal: isSmallScreen ? 16 : 24,
+                                vertical: isSmallScreen ? 8 : 12,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                            child: Text(
+                              'Cancel',
+                              style: TextStyle(
+                                fontSize: isSmallScreen ? 13 : 14,
+                              ),
+                            ),
+                          ),
+                          SizedBox(width: isSmallScreen ? 8 : 12),
+                          ElevatedButton(
+                            onPressed: () {
+                              reportProvider.fetchReport();
+                              Navigator.pop(context);
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: primaryColor,
+                              foregroundColor: Colors.white,
+                              padding: EdgeInsets.symmetric(
+                                horizontal: isSmallScreen ? 16 : 24,
+                                vertical: isSmallScreen ? 8 : 12,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                            child: Text(
+                              'Apply Filters',
+                              style: TextStyle(
+                                fontSize: isSmallScreen ? 13 : 14,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ],
-
-                  // Status filter
-                  const SizedBox(height: 16),
-                  DropdownButtonFormField<String>(
-                    value: reportProvider.selectedStatus,
-                    decoration: const InputDecoration(
-                      labelText: 'Filter by Status',
-                      isDense: true,
-                    ),
-                    items: reportProvider.uniqueStatuses.map((status) {
-                      return DropdownMenuItem<String>(
-                        value: status == 'All' ? null : status,
-                        child: Text(status),
-                      );
-                    }).toList(),
-                    onChanged: (value) {
-                      reportProvider.setStatus(value);
-                    },
                   ),
-
-                  // Priority filter
-                  const SizedBox(height: 16),
-                  DropdownButtonFormField<String>(
-                    value: reportProvider.selectedPriority,
-                    decoration: const InputDecoration(
-                      labelText: 'Filter by Priority',
-                      isDense: true,
-                    ),
-                    items: reportProvider.uniquePriorities.map((priority) {
-                      return DropdownMenuItem<String>(
-                        value: priority == 'All' ? null : priority,
-                        child: Text(priority),
-                      );
-                    }).toList(),
-                    onChanged: (value) {
-                      reportProvider.setPriority(value);
-                    },
-                  ),
-
-                  // Search
-                  const SizedBox(height: 16),
-                  TextField(
-                    decoration: const InputDecoration(
-                      labelText: 'Search',
-                      prefixIcon: Icon(Icons.search),
-                      isDense: true,
-                    ),
-                    onChanged: (value) {
-                      reportProvider.setSearchQuery(value);
-                    },
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                reportProvider.clearFilters();
-                Navigator.pop(context);
-              },
-              child: const Text('Clear All'),
-            ),
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                reportProvider.fetchReport();
-                Navigator.pop(context);
-              },
-              child: const Text('Apply'),
-            ),
-          ],
         );
       },
     );
@@ -826,123 +1598,514 @@ class _ReportScreenState extends State<ReportScreen> {
     if (reportProvider.report != null) {
       showDialog(
         context: context,
-        builder: (context) => AlertDialog(
-          title: const Text('Debug Report Info'),
-          content: SingleChildScrollView(
+        builder: (context) => Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Container(
+            constraints: BoxConstraints(
+              maxWidth: 500,
+              maxHeight: MediaQuery.of(context).size.height * 0.8,
+            ),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                _buildDebugInfo('Period', reportProvider.report!.period.formattedPeriod),
-                _buildDebugInfo('Total Tasks', reportProvider.report!.detailed.length.toString()),
-                _buildDebugInfo('User Reports', reportProvider.report!.userReports.length.toString()),
-
-                const SizedBox(height: 16),
-                const Text('Sample Tasks:', style: TextStyle(fontWeight: FontWeight.bold)),
-                ...reportProvider.report!.detailed.take(3).map((task) =>
-                    Padding(
-                      padding: const EdgeInsets.only(top: 8),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('• ${task.title}', style: const TextStyle(fontSize: 12)),
-                          Text('  Assigned: ${task.assignedTo}', style: const TextStyle(fontSize: 10, color: Colors.grey)),
-                          Text('  Company: ${task.company}', style: const TextStyle(fontSize: 10, color: Colors.grey)),
-                        ],
+                Container(
+                  padding: EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: primaryColor,
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(20),
+                      topRight: Radius.circular(20),
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(Icons.bug_report, color: Colors.white),
+                      SizedBox(width: 8),
+                      Text(
+                        'Debug Report Info',
+                        style: TextStyle(
+                          fontSize: 18,
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                    )
+                    ],
+                  ),
+                ),
+                Expanded(
+                  child: SingleChildScrollView(
+                    padding: EdgeInsets.all(20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        _buildDebugInfo('Period', reportProvider.report!.period.formattedPeriod),
+                        _buildDebugInfo('Total Tasks', reportProvider.report!.detailed.length.toString()),
+                        _buildDebugInfo('User Reports', reportProvider.report!.userReports.length.toString()),
+
+                        SizedBox(height: 16),
+                        Text(
+                          'Sample Tasks:',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.grey[800],
+                          ),
+                        ),
+                        ...reportProvider.report!.detailed.take(3).map((task) =>
+                            Container(
+                              margin: EdgeInsets.only(top: 8),
+                              padding: EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: Colors.grey[50],
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(color: Colors.grey[200]!),
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    '• ${task.title}',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                  SizedBox(height: 4),
+                                  Text(
+                                    'Assigned: ${task.assignedTo}',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: Colors.grey[600],
+                                    ),
+                                  ),
+                                  Text(
+                                    'Company: ${task.company}',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: Colors.grey[600],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            )
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                Container(
+                  padding: EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    border: Border(
+                      top: BorderSide(color: Colors.grey[200]!),
+                    ),
+                  ),
+                  child: Center(
+                    child: ElevatedButton(
+                      onPressed: () => Navigator.pop(context),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: primaryColor,
+                        foregroundColor: Colors.white,
+                        padding: EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: Text('Close'),
+                    ),
+                  ),
                 ),
               ],
             ),
           ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Close'),
-            ),
-          ],
         ),
       );
     }
   }
 
   Widget _buildDebugInfo(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
+    return Container(
+      margin: EdgeInsets.only(bottom: 12),
+      padding: EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.grey[50],
+        borderRadius: BorderRadius.circular(8),
+      ),
       child: Row(
         children: [
-          Text('$label: ', style: const TextStyle(fontWeight: FontWeight.bold)),
-          Expanded(child: Text(value)),
+          Container(
+            padding: EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: primaryColor.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(6),
+            ),
+            child: Text(
+              label,
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: primaryColor,
+                fontSize: 12,
+              ),
+            ),
+          ),
+          SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              value,
+              style: TextStyle(
+                fontSize: 14,
+                color: Colors.grey[700],
+              ),
+            ),
+          ),
         ],
       ),
     );
   }
 
   void _showAllTasksDialog(BuildContext context, List<TaskDetail> tasks) {
+    final mediaQuery = MediaQuery.of(context);
+    final isSmallScreen = mediaQuery.size.width < 350;
+
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('All Tasks'),
-        content: SizedBox(
-          width: double.maxFinite,
-          child: ListView.builder(
-            shrinkWrap: true,
-            itemCount: tasks.length,
-            itemBuilder: (context, index) {
-              final task = tasks[index];
-              return ListTile(
-                title: Text(task.title),
-                subtitle: Text('${task.assignedTo} • ${task.company}'),
-                trailing: Chip(
-                  label: Text(task.statusText),
-                  backgroundColor: task.statusColor.withOpacity(0.1),
-                  labelStyle: TextStyle(color: task.statusColor),
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Container(
+          constraints: BoxConstraints(
+            maxWidth: 500,
+            maxHeight: mediaQuery.size.height * 0.8,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                padding: EdgeInsets.all(isSmallScreen ? 16 : 20),
+                decoration: BoxDecoration(
+                  color: primaryColor,
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(20),
+                    topRight: Radius.circular(20),
+                  ),
                 ),
-              );
-            },
+                child: Row(
+                  children: [
+                    Icon(Icons.list_alt, color: Colors.white),
+                    SizedBox(width: 8),
+                    Text(
+                      'All Tasks (${tasks.length})',
+                      style: TextStyle(
+                        fontSize: isSmallScreen ? 18 : 20,
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Expanded(
+                child: tasks.isEmpty
+                    ? Center(
+                  child: Padding(
+                    padding: EdgeInsets.all(20),
+                    child: Text(
+                      'No tasks available',
+                      style: TextStyle(
+                        fontSize: isSmallScreen ? 16 : 18,
+                        color: Colors.grey[600],
+                      ),
+                    ),
+                  ),
+                )
+                    : ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: tasks.length,
+                  itemBuilder: (context, index) {
+                    final task = tasks[index];
+                    return Container(
+                      margin: EdgeInsets.symmetric(
+                        horizontal: isSmallScreen ? 12 : 16,
+                        vertical: isSmallScreen ? 4 : 6,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: Colors.grey[200]!),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey[100]!,
+                            blurRadius: 2,
+                            offset: Offset(0, 1),
+                          ),
+                        ],
+                      ),
+                      child: ListTile(
+                        leading: Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            color: task.statusColor.withOpacity(0.1),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            _getStatusIcon(task.status),
+                            color: task.statusColor,
+                            size: 20,
+                          ),
+                        ),
+                        title: Text(
+                          task.title,
+                          style: TextStyle(
+                            fontWeight: FontWeight.w500,
+                            fontSize: isSmallScreen ? 13 : 14,
+                          ),
+                        ),
+                        subtitle: Text(
+                          '${task.assignedTo} • ${task.company}',
+                          style: TextStyle(
+                            fontSize: isSmallScreen ? 11 : 12,
+                          ),
+                        ),
+                        trailing: Chip(
+                          label: Text(
+                            task.statusText,
+                            style: TextStyle(
+                              fontSize: isSmallScreen ? 10 : 11,
+                            ),
+                          ),
+                          backgroundColor: task.statusColor.withOpacity(0.1),
+                          labelStyle: TextStyle(color: task.statusColor),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+              Container(
+                padding: EdgeInsets.all(isSmallScreen ? 16 : 20),
+                decoration: BoxDecoration(
+                  border: Border(
+                    top: BorderSide(color: Colors.grey[200]!),
+                  ),
+                ),
+                child: Center(
+                  child: ElevatedButton(
+                    onPressed: () => Navigator.pop(context),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: primaryColor,
+                      foregroundColor: Colors.white,
+                      padding: EdgeInsets.symmetric(
+                        horizontal: isSmallScreen ? 32 : 48,
+                        vertical: isSmallScreen ? 10 : 12,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: Text(
+                      'Close',
+                      style: TextStyle(
+                        fontSize: isSmallScreen ? 14 : 16,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Close'),
-          ),
-        ],
       ),
     );
   }
 
   void _showAllUsersDialog(BuildContext context, List<UserReport> users) {
+    final mediaQuery = MediaQuery.of(context);
+    final isSmallScreen = mediaQuery.size.width < 350;
+
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('All Users'),
-        content: SizedBox(
-          width: double.maxFinite,
-          child: ListView.builder(
-            shrinkWrap: true,
-            itemCount: users.length,
-            itemBuilder: (context, index) {
-              final user = users[index];
-              return ListTile(
-                leading: CircleAvatar(
-                  child: Text(user.name.isNotEmpty
-                      ? user.name.substring(0, 1).toUpperCase()
-                      : '?'),
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Container(
+          constraints: BoxConstraints(
+            maxWidth: 500,
+            maxHeight: mediaQuery.size.height * 0.8,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                padding: EdgeInsets.all(isSmallScreen ? 16 : 20),
+                decoration: BoxDecoration(
+                  color: primaryColor,
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(20),
+                    topRight: Radius.circular(20),
+                  ),
                 ),
-                title: Text(user.name.isNotEmpty ? user.name : 'Unknown User'),
-                subtitle: Text(user.email.isNotEmpty ? user.email : 'No email'),
-                trailing: Text('${user.completionRate.toStringAsFixed(1)}%'),
-              );
-            },
+                child: Row(
+                  children: [
+                    Icon(Icons.people, color: Colors.white),
+                    SizedBox(width: 8),
+                    Text(
+                      'All Users (${users.length})',
+                      style: TextStyle(
+                        fontSize: isSmallScreen ? 18 : 20,
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Expanded(
+                child: users.isEmpty
+                    ? Center(
+                  child: Padding(
+                    padding: EdgeInsets.all(20),
+                    child: Text(
+                      'No users available',
+                      style: TextStyle(
+                        fontSize: isSmallScreen ? 16 : 18,
+                        color: Colors.grey[600],
+                      ),
+                    ),
+                  ),
+                )
+                    : ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: users.length,
+                  itemBuilder: (context, index) {
+                    final user = users[index];
+                    return Container(
+                      margin: EdgeInsets.symmetric(
+                        horizontal: isSmallScreen ? 12 : 16,
+                        vertical: isSmallScreen ? 4 : 6,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: Colors.grey[200]!),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey[100]!,
+                            blurRadius: 2,
+                            offset: Offset(0, 1),
+                          ),
+                        ],
+                      ),
+                      child: ListTile(
+                        leading: Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [
+                                primaryColor.withOpacity(0.2),
+                                secondaryColor.withOpacity(0.1),
+                              ],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Center(
+                            child: Text(
+                              user.name.isNotEmpty
+                                  ? user.name.substring(0, 1).toUpperCase()
+                                  : '?',
+                              style: TextStyle(
+                                color: primaryColor,
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
+                        title: Text(
+                          user.name.isNotEmpty ? user.name : 'Unknown User',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w500,
+                            fontSize: isSmallScreen ? 13 : 14,
+                          ),
+                        ),
+                        subtitle: Text(
+                          user.email.isNotEmpty ? user.email : 'No email',
+                          style: TextStyle(
+                            fontSize: isSmallScreen ? 11 : 12,
+                          ),
+                        ),
+                        trailing: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Text(
+                              '${user.completionRate.toStringAsFixed(1)}%',
+                              style: TextStyle(
+                                fontSize: isSmallScreen ? 14 : 16,
+                                fontWeight: FontWeight.bold,
+                                color: user.completionRate >= 80
+                                    ? Colors.green
+                                    : user.completionRate >= 50
+                                    ? Colors.orange
+                                    : Colors.red,
+                              ),
+                            ),
+                            SizedBox(height: 2),
+                            Text(
+                              '${user.totalTasks} tasks',
+                              style: TextStyle(
+                                fontSize: isSmallScreen ? 10 : 11,
+                                color: Colors.grey[600],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+              Container(
+                padding: EdgeInsets.all(isSmallScreen ? 16 : 20),
+                decoration: BoxDecoration(
+                  border: Border(
+                    top: BorderSide(color: Colors.grey[200]!),
+                  ),
+                ),
+                child: Center(
+                  child: ElevatedButton(
+                    onPressed: () => Navigator.pop(context),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: primaryColor,
+                      foregroundColor: Colors.white,
+                      padding: EdgeInsets.symmetric(
+                        horizontal: isSmallScreen ? 32 : 48,
+                        vertical: isSmallScreen ? 10 : 12,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: Text(
+                      'Close',
+                      style: TextStyle(
+                        fontSize: isSmallScreen ? 14 : 16,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Close'),
-          ),
-        ],
       ),
     );
   }

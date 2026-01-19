@@ -749,27 +749,24 @@ class _AddStaffScreenState extends State<AddStaffScreen> {
 
       // For Admin: Add password for manager role, company ID for all roles
       if (authProvider.isAdmin) {
-        // Add password only for manager role
-        if (_selectedRole == 'manager') {
-          if (_passwordController.text.isEmpty) {
-            throw Exception('Password is required for manager role');
-          }
-          requestBody['password'] = _passwordController.text;
+        if (_passwordController.text.isEmpty) {
+          throw Exception('Password is required');
         }
 
-        // Admin must specify company ID
+        requestBody['password'] = _passwordController.text;
         requestBody['company'] = _selectedCompanyId;
       }
+
       // For Manager: No password needed, company ID is automatically their own
       else if (authProvider.isManager) {
-        // Manager doesn't need to send companyID - backend will use their company
-        // Just ensure _selectedCompanyId is not null (it should be their company ID)
-        if (_selectedCompanyId == null) {
-          throw Exception('Unable to determine company for manager');
+        if (_passwordController.text.isEmpty) {
+          throw Exception('Password is required for staff');
         }
-        // Note: Backend should automatically use manager's company
-        // requestBody['company'] = _selectedCompanyId; // Uncomment if backend requires it
+
+        requestBody['password'] = _passwordController.text;
+        // backend can auto-assign company
       }
+
 
       print('Sending request body: $requestBody');
 
@@ -824,7 +821,6 @@ class _AddStaffScreenState extends State<AddStaffScreen> {
       });
     }
   }
-
   @override
   Widget build(BuildContext context) {
     final authProvider = context.watch<AuthProvider>();
@@ -1036,12 +1032,11 @@ class _AddStaffScreenState extends State<AddStaffScreen> {
                       ),
                       SizedBox(height: 16),
 
-                      // Password Field (only for admin creating manager)
-                      // In the build method, update the password field section:
-
-// Password Field (only for admin creating manager OR staff)
-                      // Password Field (only for admin creating manager OR staff)
-                      if (authProvider.isAdmin && (_selectedRole == 'manager' || _selectedRole == 'staff'))
+                      // Password Field (ALWAYS shown when creating users)
+                      // Admin: shown for manager and staff
+                      // Manager: shown for staff
+                      if ((authProvider.isAdmin && (_selectedRole == 'manager' || _selectedRole == 'staff')) ||
+                          (authProvider.isManager && _selectedRole == 'staff'))
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -1059,9 +1054,7 @@ class _AddStaffScreenState extends State<AddStaffScreen> {
                               style: TextStyle(fontSize: isSmallScreen ? 15 : 16),
                               obscureText: true,
                               decoration: InputDecoration(
-                                hintText: _selectedRole == 'manager'
-                                    ? 'Enter password for manager'
-                                    : 'Enter password for staff',
+                                hintText: 'Enter password',
                                 prefixIcon: Icon(Icons.lock_outline_rounded, color: Colors.grey[500]),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(10),
@@ -1081,9 +1074,11 @@ class _AddStaffScreenState extends State<AddStaffScreen> {
                                 ),
                               ),
                               validator: (value) {
-                                if (authProvider.isAdmin && (_selectedRole == 'manager' || _selectedRole == 'staff')) {
+                                // Check if password is required for the current scenario
+                                if ((authProvider.isAdmin && (_selectedRole == 'manager' || _selectedRole == 'staff')) ||
+                                    (authProvider.isManager && _selectedRole == 'staff')) {
                                   if (value == null || value.isEmpty) {
-                                    return 'Password is required for ${_selectedRole!}';
+                                    return 'Password is required';
                                   }
                                   if (value.length < 6) {
                                     return 'Password must be at least 6 characters';
@@ -1095,6 +1090,7 @@ class _AddStaffScreenState extends State<AddStaffScreen> {
                             SizedBox(height: 16),
                           ],
                         ),
+
                       // Phone Number Field
                       Text(
                         'Phone Number',

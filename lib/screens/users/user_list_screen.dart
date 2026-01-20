@@ -181,7 +181,7 @@ class _UsersScreenState extends State<UsersScreen> {
                     selected: isSelected,
                     onSelected: (_) => userProvider.setFilterRole(role),
                     backgroundColor: Colors.grey[100],
-                    selectedColor: Colors.blue[600],
+                    selectedColor: Colors.deepPurple.shade400,
                     checkmarkColor: Colors.white,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),

@@ -177,90 +177,90 @@ class CompanyCard extends StatelessWidget {
                       primaryColor,
                     ),
 
-                    SizedBox(height: isSmallPhone ? 12 : 16),
-                    Divider(
-                      height: 1,
-                      color: Colors.grey.shade200,
-                    ),
-                    SizedBox(height: isSmallPhone ? 12 : 16),
+                    // SizedBox(height: isSmallPhone ? 12 : 16),
+                    // Divider(
+                    //   height: 1,
+                    //   color: Colors.grey.shade200,
+                    // ),
+                    // SizedBox(height: isSmallPhone ? 12 : 16),
 
                     // Stats Row
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
+                    // Row(
+                    //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    //   children: [
                         // Team Members with purple accent
-                        Container(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: isSmallPhone ? 12 : 16,
-                            vertical: isSmallPhone ? 6 : 8,
-                          ),
-                          decoration: BoxDecoration(
-                            color: primaryColor.withOpacity(0.08),
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                              color: primaryColor.withOpacity(0.2),
-                              width: 1,
-                            ),
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Text(
-                                'TEAM',
-                                style: TextStyle(
-                                  fontSize: smallFontSize,
-                                  color: primaryColor,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                              SizedBox(height: isSmallPhone ? 2 : 4),
-                              Text(
-                                '${company.totalUser}',
-                                style: TextStyle(
-                                  fontSize: isSmallPhone ? 18 : 22,
-                                  fontWeight: FontWeight.w800,
-                                  color: primaryColor,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
+                        // Container(
+                        //   padding: EdgeInsets.symmetric(
+                        //     horizontal: isSmallPhone ? 12 : 16,
+                        //     vertical: isSmallPhone ? 6 : 8,
+                        //   ),
+                        //   decoration: BoxDecoration(
+                        //     color: primaryColor.withOpacity(0.08),
+                        //     borderRadius: BorderRadius.circular(12),
+                        //     border: Border.all(
+                        //       color: primaryColor.withOpacity(0.2),
+                        //       width: 1,
+                        //     ),
+                        //   ),
+                        //   child: Column(
+                        //     crossAxisAlignment: CrossAxisAlignment.center,
+                        //     children: [
+                        //       Text(
+                        //         'TEAM',
+                        //         style: TextStyle(
+                        //           fontSize: smallFontSize,
+                        //           color: primaryColor,
+                        //           fontWeight: FontWeight.w600,
+                        //         ),
+                        //       ),
+                        //       SizedBox(height: isSmallPhone ? 2 : 4),
+                        //       Text(
+                        //         '${company.totalUser}',
+                        //         style: TextStyle(
+                        //           fontSize: isSmallPhone ? 18 : 22,
+                        //           fontWeight: FontWeight.w800,
+                        //           color: primaryColor,
+                        //         ),
+                        //       ),
+                        //     ],
+                        //   ),
+                        // ),
 
                         // Created Date with subtle styling
-                        Container(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: isSmallPhone ? 12 : 16,
-                            vertical: isSmallPhone ? 6 : 8,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.grey.shade50,
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Text(
-                                'CREATED',
-                                style: TextStyle(
-                                  fontSize: smallFontSize,
-                                  color: Colors.grey.shade600,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                              SizedBox(height: isSmallPhone ? 2 : 4),
-                              Text(
-                                DateFormat('MMM dd, yyyy').format(company.createdAt),
-                                style: TextStyle(
-                                  fontSize: bodyFontSize,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.grey.shade800,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
+                        // Container(
+                        //   padding: EdgeInsets.symmetric(
+                        //     horizontal: isSmallPhone ? 12 : 16,
+                        //     vertical: isSmallPhone ? 6 : 8,
+                        //   ),
+                        //   decoration: BoxDecoration(
+                        //     color: Colors.grey.shade50,
+                        //     borderRadius: BorderRadius.circular(12),
+                        //   ),
+                        //   child: Column(
+                        //     crossAxisAlignment: CrossAxisAlignment.center,
+                        //     children: [
+                        //       Text(
+                        //         'CREATED',
+                        //         style: TextStyle(
+                        //           fontSize: smallFontSize,
+                        //           color: Colors.grey.shade600,
+                        //           fontWeight: FontWeight.w600,
+                        //         ),
+                        //       ),
+                        //       SizedBox(height: isSmallPhone ? 2 : 4),
+                        //       Text(
+                        //         DateFormat('MMM dd, yyyy').format(company.createdAt),
+                        //         style: TextStyle(
+                        //           fontSize: bodyFontSize,
+                        //           fontWeight: FontWeight.w600,
+                        //           color: Colors.grey.shade800,
+                        //         ),
+                        //       ),
+                        //     ],
+                        //   ),
+                        // ),
+                    //   ],
+                    // ),
                   ],
                 ),
               ),
@@ -271,7 +271,7 @@ class CompanyCard extends StatelessWidget {
           Container(
             padding: EdgeInsets.symmetric(
               horizontal: cardPadding,
-              vertical: isSmallPhone ? 10 : 12,
+              vertical: isSmallPhone ? 20 : 22,
             ),
             decoration: BoxDecoration(
               color: Colors.grey.shade50,

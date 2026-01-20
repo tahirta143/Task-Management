@@ -659,6 +659,7 @@
 // }
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:taskflow_app/screens/Task/TaskListScreen.dart';
 import 'package:taskflow_app/widgets/dashboard/recent_tasks.dart';
 import 'package:taskflow_app/widgets/dashboard/stats_grid.dart';
 import 'package:shimmer/shimmer.dart';
@@ -708,7 +709,7 @@ class AdminDashboard extends StatelessWidget {
             const SizedBox(height: 24),
 
             // Recent Tasks Section
-            _buildRecentTasksSection(dashboardProvider, showShimmer, theme),
+            _buildRecentTasksSection(context,dashboardProvider, showShimmer, theme),
 
             const SizedBox(height: 32),
           ],
@@ -1248,7 +1249,8 @@ class AdminDashboard extends StatelessWidget {
   }
 
   Widget _buildRecentTasksSection(
-      DashboardProvider dashboardProvider, bool showShimmer, ThemeData theme) {
+  BuildContext context,
+      DashboardProvider dashboardProvider, bool showShimmer, ThemeData theme,) {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
@@ -1290,6 +1292,7 @@ class AdminDashboard extends StatelessWidget {
               IconButton(
                 onPressed: () {
                   // Navigate to all tasks
+                  Navigator.push(context, MaterialPageRoute(builder: (context)=>TaskListScreen()));
                 },
                 icon: Container(
                   width: 44,
